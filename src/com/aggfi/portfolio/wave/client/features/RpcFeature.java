@@ -31,6 +31,7 @@
 package com.aggfi.portfolio.wave.client.features;
 
 import com.google.gwt.gadgets.client.GadgetFeature;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * This class works with the NeedsRpc interface get the GWT gadgets support to emit the &lt;Require feature="rpc"&gt;
@@ -39,4 +40,5 @@ import com.google.gwt.gadgets.client.GadgetFeature;
  * @author amoffat Alex Moffat
  */
 public class RpcFeature implements GadgetFeature {
+	private RpcFeature(){};
 }

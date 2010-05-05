@@ -4,21 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 
-//import org.cobogw.gwt.waveapi.gadget.client.StateUpdateEvent;
-//import org.cobogw.gwt.waveapi.gadget.client.StateUpdateEventHandler;
-//import org.cobogw.gwt.waveapi.gadget.client.WaveGadget;
-//
-//import com.aggfi.portfolio.wave.client.features.NeedsRpc;
-//import com.aggfi.portfolio.wave.client.features.RpcFeature;
-//import com.google.gwt.gadgets.client.DynamicHeightFeature;
-//import com.google.gwt.gadgets.client.IntrinsicFeature;
-//import com.google.gwt.gadgets.client.NeedsDynamicHeight;
-//import com.google.gwt.gadgets.client.NeedsIntrinsics;
-//import com.google.gwt.gadgets.client.UserPreferences;
-//import com.google.gwt.gadgets.client.Gadget.InjectModulePrefs;
-//import com.google.gwt.gadgets.client.Gadget.ModulePrefs;
-//import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import org.cobogw.gwt.waveapi.gadget.client.StateUpdateEvent;
+import org.cobogw.gwt.waveapi.gadget.client.StateUpdateEventHandler;
+import org.cobogw.gwt.waveapi.gadget.client.WaveGadget;
+
+import com.aggfi.portfolio.wave.client.features.NeedsRpc;
+import com.aggfi.portfolio.wave.client.features.RpcFeature;
+import com.google.gwt.gadgets.client.DynamicHeightFeature;
+import com.google.gwt.gadgets.client.IntrinsicFeature;
+import com.google.gwt.gadgets.client.NeedsDynamicHeight;
+import com.google.gwt.gadgets.client.NeedsIntrinsics;
+import com.google.gwt.gadgets.client.UserPreferences;
+import com.google.gwt.gadgets.client.Gadget.InjectModulePrefs;
+import com.google.gwt.gadgets.client.Gadget.ModulePrefs;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 //import com.aggfi.portfolio.wave.client.finance.AuthSub;
 //import com.aggfi.portfolio.wave.client.finance.FinanceRetrievePortfolios;
@@ -49,9 +51,10 @@ import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */ 
-//@ModulePrefs(title = "WavePortfolio",author="Yuri Zelikov",author_email="vega113@aggfi.com")
-//public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsRpc, NeedsIntrinsics {
-public class WavePortfolio implements EntryPoint {
+@ModulePrefs(title = "WavePortfolio",author="Yuri Zelikov",author_email="vega113@aggfi.com")
+public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight{
+//	public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsRpc, NeedsIntrinsics {
+//public class WavePortfolio implements EntryPoint {
 
 	//
 	private String portUserName = "Yuri";
@@ -65,27 +68,31 @@ public class WavePortfolio implements EntryPoint {
 	private CwMessages messages = GWT.create(CwMessages.class);
 	private List<DisclosureWidget> overviewDsList = null;
 	
-	GFinanceServiceAsync finService = GWT.create(GFinanceService.class);
+//	GFinanceServiceAsync finService = GWT.create(GFinanceService.class);
 	
 //	FinanceRetrievePortfolios finService = new FinanceRetrievePortfolios();
 	
-	/*
+	
 	@Override
 	protected void init(UserPreferences preferences) {
 		try{
 			
-			ServiceDefTarget serviceDef = (ServiceDefTarget) finService;
-		    String rpcUrl = serviceDef.getServiceEntryPoint();
+//			ServiceDefTarget serviceDef = (ServiceDefTarget) finService;
+//		    String rpcUrl = serviceDef.getServiceEntryPoint();
 		    
-		   
 		    if(true){//if use useCachedXHR
-		    	 rpcUrl = imf.getCachedUrl(rpcUrl);
-		         serviceDef.setServiceEntryPoint(rpcUrl);
+//		    	 Log.debug("Orig rpcUrl: " + rpcUrl);
+//		    	 Log.debug("Cached rpcUrl: " + imf.getCachedUrl(rpcUrl));
+//		    	 Log.debug("Image rpcUrl: " + imf.getImageUrl(rpcUrl));
+//		    	 rpcUrl = imf.getCachedUrl(rpcUrl);
+		    	 
+//		    	 serviceDef.setServiceEntryPoint(rpcUrl);
 		    }
 		    
-			dhf.getContentDiv().add(new AuthSub());
+//			dhf.getContentDiv().add(new AuthSub());
 			DockPanel dock = createWidgetPanel();
 			dhf.getContentDiv().add(dock);
+			//retrieveOverviewPortHeaders("http://localhost:8888/json");//FIXME change URL
 		}catch(Exception e){
 			handleError(e);
 		}
@@ -119,6 +126,8 @@ public class WavePortfolio implements EntryPoint {
 		
 	}
 	
+	/*
+	
 	protected RpcFeature rpcf = null;
 	@Override
 	public void initializeFeature(RpcFeature feature) {
@@ -129,12 +138,12 @@ public class WavePortfolio implements EntryPoint {
 	public void initializeFeature(IntrinsicFeature feature) {
 	    this.imf = feature;
 	  }
-
 	*/
+	
 	/**
 	 * This is the entry point method.
 	 */
-	
+	/*
 	public void onModuleLoad() {
 		
 		try{
@@ -149,34 +158,41 @@ public class WavePortfolio implements EntryPoint {
 			
 			panel = RootPanel.get("container3");
 			initRemoteLogger(panel);
+			retrieveOverviewPortHeaders("http://localhost:8888/json");//FIXME change URL
 		}catch(Exception e){
 			handleError(e);
 		}
 	}
 	
+	*/
 	
 
 	private DockPanel createWidgetPanel() {
+		Log.debug("Entering createWidgetPanel");
 		final FlexTable layout = new FlexTable();
 
 		layout.setCellSpacing(1);
 		//	    layout.setWidth(LAYOUT_WIDTH);
 
+		/*
 		DeferredCommand.addCommand(new Command() {
 
 			@Override
 			public void execute() {
 				finService.retrievePortfolioNames("vega113@gmail.com", new AsyncCallback<OverviewPortHeader[]>() {
 					public void onFailure(Throwable error) {
+						Log.warn("Exception in call to finService.retrievePortfolioNames", error);
 						handleError(error);
 					}
 					public void onSuccess(OverviewPortHeader[] portHeaders) {
+						Log.debug("Success on finService.retrievePortfolioNames");
 						displayPortfolioNames(portHeaders,layout);
 					}
 				});
 			}
 		});
-
+		*/
+		//"http://waveportfolio.appspot.com/json"
 
 		DockPanel dock = new DockPanel();
 		//	    dock.setStyleName("cw-DockPanel");
@@ -207,6 +223,8 @@ public class WavePortfolio implements EntryPoint {
 
 		//------------------
 		dock.add(tabPanel, DockPanel.SOUTH);
+		
+		Log.debug("Exiting createWidgetPanel");
 		return dock;
 	}
 		
@@ -257,7 +275,18 @@ public class WavePortfolio implements EntryPoint {
 	}
 	
 	private void handleError(Throwable error) {
-		Log.error(error.getLocalizedMessage());	
+			
+		Log.error(error.getMessage());	
+		Log.error(error.toString());	
+		for(StackTraceElement el : error.getStackTrace()){
+			Log.error(el.toString());
+			Log.trace("Trace: ", error);
+		}
+		if(error instanceof com.google.gwt.user.client.rpc.StatusCodeException){
+			com.google.gwt.user.client.rpc.StatusCodeException ex = (com.google.gwt.user.client.rpc.StatusCodeException)error;
+			Log.error("Status code: " + ex.getStatusCode() + ", Message: " + ex.getMessage());
+			Log.trace("Trace: ", ex);
+		}
 	}
 	
 	
@@ -351,11 +380,24 @@ public class WavePortfolio implements EntryPoint {
 		   * 
 		   * @param name
 		   * @param change
-		   * @param gain
 		   * @return Whole overview portfolio header
 		   */
-		  @DefaultMessage("{0} - Change: {1}")
+		  @DefaultMessage("{0}  Change: {1}")
 		  String cwOverviewPortHeader(String name, String change);
 		}
+	  
+	  public void acceptOverviewPortHeaderJson(String portNames){
+		  Log.debug("Inside acceptOverviewPortHeader: " + portNames);
+	  }
+
+	  public native void retrieveOverviewPortHeaders(String url) /*-{
+	    var myObj = this;
+		var params = {};
+		params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.GET;
+		params[gadgets.io.RequestParameters.REFRESH_INTERVAL] = 1;
+		gadgets.io.makeRequest(url, function(obj) {
+		myObj.@com.aggfi.portfolio.wave.client.WavePortfolio::acceptOverviewPortHeaderJson(Ljava/lang/String;)(obj.text);
+			}, params); 
+	 }-*/;
 	 
 }

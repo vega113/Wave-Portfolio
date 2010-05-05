@@ -2,6 +2,8 @@ package com.aggfi.portfolio.wave.server;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +22,10 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 @SuppressWarnings("serial")
 public class GFinanceServiceImpl extends RemoteServiceServlet implements GFinanceService {
 
+	Logger log = Logger.getLogger(this.getClass().getName());
 	@Override
 	public OverviewPortHeader[] retrievePortfolioNames(String userId) throws IllegalArgumentException {
+		log.info("Entering retrievePortfolioNames");
 		// Verify that the input is valid. 
 		if (!FieldVerifier.isValidUserId(userId)) {
 			// If the input is not valid, throw an IllegalArgumentException back to
@@ -34,13 +38,16 @@ public class GFinanceServiceImpl extends RemoteServiceServlet implements GFinanc
 		try {
 			portHeaders = FinancePortfolioClient.retrievePortHeaders();
 		} catch (MalformedURLException e) {
+			log.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage());
 		} catch (ServiceException e) {
 			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage());
 		}
-
+		log.info("Exiting retrievePortfolioNames");
 		return portHeaders;
 	}
 
@@ -80,10 +87,10 @@ public class GFinanceServiceImpl extends RemoteServiceServlet implements GFinanc
 	/**
 	   * Do not validate HTTP headers - iGoogle munges them.
 	   */
-	  @Override
-	  protected String readContent(HttpServletRequest request)
-	      throws ServletException, IOException {
-	    return RPCServletUtils.readContentAsUtf8(request, false);
-	  }
-	
+//	  @Override
+//	  protected String readContent(HttpServletRequest request)
+//	      throws ServletException, IOException {
+//	    return RPCServletUtils.readContentAsUtf8(request, false);
+//	  }
+//	
 }

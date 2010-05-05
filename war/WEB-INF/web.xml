@@ -11,10 +11,15 @@
 		<servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
 	</servlet>
 
+<!--	<servlet>-->
+<!--		<servlet-name>gFinanceServlet</servlet-name>-->
+<!--		<servlet-class>com.aggfi.portfolio.wave.server.GFinanceServiceImpl</servlet-class>-->
+<!--	</servlet>-->
+	
 	<servlet>
-		<servlet-name>gFinanceServlet</servlet-name>
-		<servlet-class>com.aggfi.portfolio.wave.server.GFinanceServiceImpl</servlet-class>
-	</servlet>
+    <servlet-name>jsonOverviewPortHeader</servlet-name>
+    <servlet-class>com.aggfi.portfolio.wave.server.JsonOverviewPortHeader</servlet-class>
+  </servlet>
 
 
 	<servlet-mapping>
@@ -22,11 +27,16 @@
 		<url-pattern>/waveportfolio/gwt-log</url-pattern>
 	</servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>gFinanceServlet</servlet-name>
-		<url-pattern>/waveportfolio/gfinance</url-pattern>
-	</servlet-mapping>
+<!--	<servlet-mapping>-->
+<!--		<servlet-name>gFinanceServlet</servlet-name>-->
+<!--		<url-pattern>/waveportfolio/gfinance</url-pattern>-->
+<!--	</servlet-mapping>-->
 	<!-- Default page to serve -->
+
+  <servlet-mapping>
+    <servlet-name>jsonOverviewPortHeader</servlet-name>
+    <url-pattern>/waveportfolio/json</url-pattern>
+  </servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>WavePortfolio.html</welcome-file>
 	</welcome-file-list>
