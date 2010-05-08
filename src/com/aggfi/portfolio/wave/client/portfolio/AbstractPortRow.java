@@ -2,21 +2,47 @@ package com.aggfi.portfolio.wave.client.portfolio;
 
 import java.io.Serializable;
 
-public class AbstractPortRow implements Serializable {
+public class AbstractPortRow implements Serializable, IAbstractRow {
+	/* (non-Javadoc)
+	 * @see com.aggfi.portfolio.wave.client.portfolio.IAbstractRow#getName()
+	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
-	public void setName(String name) {
-		this.name = name;
-	}
+	/* (non-Javadoc)
+	 * @see com.aggfi.portfolio.wave.client.portfolio.IAbstractRow#getSymbol()
+	 */
 	public String getSymbol() {
-		return symbol;
-	}
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
+		return this.symbol;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.aggfi.portfolio.wave.client.portfolio.IAbstractRow#getRowNum()
+	 */
+	public int getRowNum() {
+		return this.rowNum;
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.aggfi.portfolio.wave.client.portfolio.IAbstractRow#getStockId()
+	 */
+	public String getStockId() {
+		return stockId;
+	}
+
 	protected String name;
 	protected String symbol;
+	
+	private int rowNum;
+	private String stockId;
+	
+	public void initOverviewPortRow(String name, String symbol, int rowNum, String stockId) {
+		
+		
+		this.name = name;
+		this.symbol = symbol;
+		this.rowNum = rowNum;
+		this.stockId = stockId;
+	}
 
 }

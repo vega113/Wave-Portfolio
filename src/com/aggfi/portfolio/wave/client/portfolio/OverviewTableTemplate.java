@@ -36,32 +36,56 @@ public class OverviewTableTemplate extends FlexTable {
 		this.setText(0, 9, constants.cwDaysGain());
 	}
 	
-	public void addRow(OverviewPortRow row){
+	public void addRow(IOverviewRow row){
 		int rowsCount = getRowCount();
-		NumberFormat fmtDec2 = NumberFormat.getFormat("########.##");
-		NumberFormat fmtDec3 = NumberFormat.getFormat("###.##");
+		updateRow(row, rowsCount);
+		
+	}
+
+	public void updateRow(IOverviewRow row, int rowsCount) {
+		NumberFormat fmtDec2 = NumberFormat.getFormat("######00.00");
+		NumberFormat fmtDec3 = NumberFormat.getFormat("##0.00");
 		
 
 		
 		String changeStr = fmtBig.formatChange(row.getChangeAbsVal(), row.getChangePercent(), messages);
 		
 		if (!row.isCashRow()) {
-			this.setText(rowsCount, 0, row.getName());
-			this.setText(rowsCount, 1, row.getSymbol());
-			this.setText(rowsCount, 2, fmtDec2.format(row.getLastPrice()));
-			this.setText(rowsCount, 3, changeStr);
-			this.setText(rowsCount, 4, fmtBig.format(row.getMktCap()));
-			this.setText(rowsCount, 5, fmtBig.format(row.getVolume()));
-			this.setText(rowsCount, 6, fmtDec2.format(row.getOpen()));
-			this.setText(rowsCount, 7, fmtDec2.format(row.getHigh()));
-			this.setText(rowsCount, 8, fmtDec2.format(row.getLow()));
-			this.setText(rowsCount, 9, String.valueOf(row.getDaysGain()));
+			if (row.getName() != null) {
+				this.setText(rowsCount, 0, row.getName());
+			}
+			if (row.getSymbol() != null) {
+				this.setText(rowsCount, 1, row.getSymbol());
+			}
+			if (row.getLastPrice() > -1) {
+				this.setText(rowsCount, 2, fmtDec2.format(row.getLastPrice()));
+			}
+			if (changeStr != null) {
+				this.setText(rowsCount, 3, changeStr);
+			}
+			if (row.getMktCap() > -1) {
+				this.setText(rowsCount, 4, fmtBig.format(row.getMktCap()));
+			}
+			if (row.getVolume() > -1) {
+				this.setText(rowsCount, 5, fmtBig.format(row.getVolume()));
+			}
+			if (row.getOpen() > -1) {
+				this.setText(rowsCount, 6, fmtDec2.format(row.getOpen()));
+			}
+			if (row.getHigh() > -1) {
+				this.setText(rowsCount, 7, fmtDec2.format(row.getHigh()));
+			}
+			if (row.getLow() > -1) {
+				this.setText(rowsCount, 8, fmtDec2.format(row.getLow()));
+			}
+			if (row.getDaysGain() > -1) {
+				this.setText(rowsCount, 9, fmtDec3.format(row.getDaysGain()));
+			}
 		}else{
 			NumberFormat fmtCur = NumberFormat.getCurrencyFormat(row.getCurrencyCode());
 			this.setText(rowsCount, 0, row.getName());
 			this.setText(rowsCount, 2, fmtCur.format(row.getLastPrice()));
 		}
-		
 	}
 	
 	
@@ -71,6 +95,6 @@ public class OverviewTableTemplate extends FlexTable {
 			removeRow(getRowCount()-1);
 		}
 	}
-	
+
 	
 }

@@ -14,7 +14,7 @@ public class OverviewPortHeader implements Serializable {
 	public double getChangePercent() {
 		return changePercent;
 	}
-	public void init(String portName, double changeAbsVal,
+	public void init(String portName, String portId, double changeAbsVal,
 			double changePercent, double gain) {
 		StringBuffer name = null;
 		if(portName.length() > MAX_PORT_NAME_LENGTH){
@@ -31,16 +31,23 @@ public class OverviewPortHeader implements Serializable {
 		this.changeAbsVal = changeAbsVal;
 		this.changePercent = changePercent;
 		this.gain = gain;
+		this.portId = portId;
 	}
 	
 	public double getGain() {
 		return gain;
 	}
+	
+	public String getPortId() {
+		return portId;
+	}
 
-	String portName;
-	double changeAbsVal;
-	double changePercent;
-	double gain;
+	private String portName;
+	private String portId;
+	private double changeAbsVal;
+	private double changePercent;
+	private double gain;
+	
 	
 
 }

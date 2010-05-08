@@ -16,11 +16,6 @@
 <!--		<servlet-class>com.aggfi.portfolio.wave.server.GFinanceServiceImpl</servlet-class>-->
 <!--	</servlet>-->
 	
-	<servlet>
-    <servlet-name>jsonOverviewPortHeader</servlet-name>
-    <servlet-class>com.aggfi.portfolio.wave.server.JsonOverviewPortHeader</servlet-class>
-  </servlet>
-
 
 	<servlet-mapping>
 		<servlet-name>remoteLoggerServiceImpl</servlet-name>
@@ -33,10 +28,6 @@
 <!--	</servlet-mapping>-->
 	<!-- Default page to serve -->
 
-  <servlet-mapping>
-    <servlet-name>jsonOverviewPortHeader</servlet-name>
-    <url-pattern>/waveportfolio/json</url-pattern>
-  </servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>WavePortfolio.html</welcome-file>
 	</welcome-file-list>

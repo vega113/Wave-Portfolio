@@ -27,6 +27,7 @@ public class DisclosureWidget extends VerticalPanel {
 	private CwConstants constants = null;
 	private CwMessages messages = null;
 	protected String portName = "";
+	protected String portId = "";
 	private String userId = "";
 	protected DisclosurePanel disclosurePanel;
 	private boolean isPortRetrieved = false;
@@ -38,7 +39,7 @@ public class DisclosureWidget extends VerticalPanel {
 	
 	private FormatBigNumbers fmtBig;
 	
-	private String formatPortHeader(String name, double changeAbsVal, double changePercent, double gain, CwConstants constants, CwMessages messages ){
+	private String formatPortHeader(String name, String portId, double changeAbsVal, double changePercent, double gain, CwConstants constants, CwMessages messages ){
 		String headerStr = fmtBig.formatChange(changeAbsVal, changePercent, messages);
 		NumberFormat nfmt3 = NumberFormat.getFormat("########.##");
 		String sign3 = gain < 0 ? "" : "+";
@@ -56,8 +57,13 @@ public class DisclosureWidget extends VerticalPanel {
 		  this.changeAbsVal = portHeader.getChangeAbsVal();
 		  this.changePercent = portHeader.getChangePercent();
 		  this.gain = portHeader.getGain();
-		  this.header = formatPortHeader(portName, changeAbsVal, changePercent,gain, constants, messages);
+		  this.portId = portHeader.getPortId();
+		  this.header = formatPortHeader(portName, portId, changeAbsVal, changePercent,gain, constants, messages);
 		  onInitialize();
+	}
+
+	public String getPortId() {
+		return portId;
 	}
 
 	/**
@@ -82,9 +88,13 @@ public class DisclosureWidget extends VerticalPanel {
 	  }
 	  
 	  public void portPopulate(OverviewPortRow[] result){
-		  	table.clear();
+//		  	table.clear();
 			for(OverviewPortRow row : result){
-				table.addRow(row);
+				if(table.getRowCount() < row.getRowNum()){
+					table.addRow(row);
+				}else{
+					table.updateRow(row,row.getRowNum());
+				}
 			}
 			disclosurePanel.setContent(table);
 	  }

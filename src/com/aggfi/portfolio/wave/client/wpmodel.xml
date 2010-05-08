@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<waveportfolio>
+	<consumer_portfolios>
+		<consumer_portfolio id="1">
+			<overview>
+			</overview>
+			<fundamentals>
+			</fundamentals>
+		</consumer_portfolio>
+	</consumer_portfolios>
+	<screener_portfolios>
+	</screener_portfolios>
+	<provider_portfolios>
+	</provider_portfolios>
+</waveportfolio>
