@@ -9,7 +9,7 @@
   <inherits name='com.google.gwt.user.theme.standard.Standard'/>
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
-<!--  <inherits name="com.google.gwt.gadgets.Gadgets" />-->
+  <inherits name="com.google.gwt.gadgets.Gadgets" />
 <!--   <inherits name='org.cobogw.gwt.waveapi.gadget.WaveGadget' />-->
 
   <!-- Other module inherits      --> 
@@ -25,4 +25,7 @@
   <source path='shared'/>
   
   <set-property name="user.agent" value="gecko"/>
+ <!-- Load the Google Finance Quote script prior to loading the gwt scripts -->
+<!-- <script src="http%3a%2f%2fwww.google.com%2fjsapi%3fautoload%3d%7bmodules%3a%5b%7bname%3agdata%2cversion%3a2.x%2cpackages%3a%5bfinance%5d%7d%5d%7d"></script>-->
+<!--  <script src="http://waveportfolio.appspot.com/quote.js"></script>-->
 </module>

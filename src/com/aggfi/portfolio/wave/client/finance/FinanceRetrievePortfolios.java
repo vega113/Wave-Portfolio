@@ -75,12 +75,12 @@ public class FinanceRetrievePortfolios extends AbstractWavePortfolio {
    * success and failure handlers.
    * Here, the failure handler displays an error message while the
    * success handler calls showData to display the portfolio entries.
+ * @param portfoliosFeedUri The uri of the portfolios feed
    * 
-   * @param portfoliosFeedUri The uri of the portfolios feed
- * @throws CallErrorException 
+   * @throws CallErrorException 
    */
   
-  public void retrievePortfolioNames(String userId, final AsyncCallback<OverviewPortHeader[]> callback) {
+  public void retrievePortfolioNames(final AsyncCallback<OverviewPortHeader[]> callback) {
 	  
 	  if (!GData.isLoaded(GDataSystemPackage.FINANCE)) {
 	    	logStr += "Loading the GData Finance package...";

@@ -11,15 +11,21 @@ import com.google.gwt.core.client.EntryPoint;
 //import org.cobogw.gwt.waveapi.gadget.client.StateUpdateEventHandler;
 //import org.cobogw.gwt.waveapi.gadget.client.WaveGadget;
 //
-//import com.google.gwt.gadgets.client.DynamicHeightFeature;
-//import com.google.gwt.gadgets.client.NeedsDynamicHeight;
-//import com.google.gwt.gadgets.client.UserPreferences;
-//import com.google.gwt.gadgets.client.Gadget.ModulePrefs;
+import com.google.gwt.gadgets.client.DynamicHeightFeature;
+import com.google.gwt.gadgets.client.Gadget;
+import com.google.gwt.gadgets.client.NeedsDynamicHeight;
+import com.google.gwt.gadgets.client.UserPreferences;
+import com.google.gwt.gadgets.client.Gadget.ModulePrefs;
 
 //import com.aggfi.portfolio.wave.client.finance.AuthSub;
 //import com.aggfi.portfolio.wave.client.finance.FinanceRetrievePortfolios;
 import com.aggfi.portfolio.wave.client.finance.AuthSub;
+//import com.aggfi.portfolio.wave.client.finance.FinanceFeature;
 import com.aggfi.portfolio.wave.client.finance.FinanceRetrievePortfolios;
+//import com.aggfi.portfolio.wave.client.finance.NeedsFinance;
+//import com.aggfi.portfolio.wave.client.finance.Quote;
+//import com.aggfi.portfolio.wave.client.finance.QuoteUpdateEvent;
+//import com.aggfi.portfolio.wave.client.finance.QuoteUpdateEventHandler;
 import com.aggfi.portfolio.wave.client.portfolio.OverviewPortHeader;
 import com.aggfi.portfolio.wave.client.portfolio.OverviewPortRow;
 import com.allen_sauer.gwt.log.client.DivLogger;
@@ -49,9 +55,10 @@ import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
  * Entry point classes define <code>onModuleLoad()</code>.
  */ 
 //@ModulePrefs(title = "WavePortfolio",author="Yuri Zelikov",author_email="vega113@aggfi.com")
-//public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight{
+//public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsFinance{
 //	public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsRpc, NeedsIntrinsics {
-public class WavePortfolio implements EntryPoint {
+//public class WavePortfolio implements EntryPoint {
+public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynamicHeight {
 
 	//
 	private String portUserName = "Yuri";
@@ -69,22 +76,11 @@ public class WavePortfolio implements EntryPoint {
 
 	FlexTable layoutOverview = null;;
 
-	/*
+
 	@Override
 	protected void init(UserPreferences preferences) {
 		try{
 
-//			ServiceDefTarget serviceDef = (ServiceDefTarget) finService;
-//		    String rpcUrl = serviceDef.getServiceEntryPoint();
-
-		    if(true){//if use useCachedXHR
-//		    	 Log.debug("Orig rpcUrl: " + rpcUrl);
-//		    	 Log.debug("Cached rpcUrl: " + imf.getCachedUrl(rpcUrl));
-//		    	 Log.debug("Image rpcUrl: " + imf.getImageUrl(rpcUrl));
-//		    	 rpcUrl = imf.getCachedUrl(rpcUrl);
-
-//		    	 serviceDef.setServiceEntryPoint(rpcUrl);
-		    }
 
 //			dhf.getContentDiv().add(new AuthSub());
 			DockPanel dock = createWidgetPanel();
@@ -101,28 +97,58 @@ public class WavePortfolio implements EntryPoint {
 		});
 
 		dhf.adjustHeight();
-		getWave().addStateUpdateEventHandler(new StateUpdateEventHandler() {
-			@Override
-			public void onUpdate(StateUpdateEvent event) {
-				DeferredCommand.addCommand(new Command() {
-
-					@Override
-					public void execute() {
-						dhf.adjustHeight();
-					}
-				});
-			}
-		});
+//		getWave().addStateUpdateEventHandler(new StateUpdateEventHandler() {
+//			@Override
+//			public void onUpdate(StateUpdateEvent event) {
+//				DeferredCommand.addCommand(new Command() {
+//
+//					@Override
+//					public void execute() {
+//						dhf.adjustHeight();
+//					}
+//				});
+//			}
+//		});
+//		populatePortfolioNames(layoutOverview);
+		
+//		fh.getQuoteInstance().getQuote("DOX");
+		
+			
+//		try{
+//			//				Quote quote  = null;
+//			//				quote = fh.getQuoteInstance();
+//			//				Log.debug("finance: " + fh.initFinance());
+//			////				quote.getQuote("DOX");
+//			fh.addQuoteUpdateEventHandler(new QuoteUpdateEventHandler() {
+//
+//				@Override
+//				public void onUpdate(QuoteUpdateEvent event) {
+//					Log.debug("Inside addQuoteUpdateEventHandler:onUpdate");
+//					double last = event.getData().getLast();
+//					Log.debug("Last price: " + last);
+//				}
+//			});
+//		}catch(Throwable e){
+//			Log.error("Error with finance", e);
+//		}
+		
 	}
 
-	protected DynamicHeightFeature dhf = null;
 
+	protected DynamicHeightFeature dhf = null;
 	@Override
 	public void initializeFeature(DynamicHeightFeature feature) {
 		dhf= feature;
 
 	}
+//	
+//	private FinanceFeature fh;
+//	@Override
+//	public void initializeFeature(FinanceFeature feature) {
+//		this.fh = feature;
+//	}
 
+	
 	/*
 
 	protected RpcFeature rpcf = null;
@@ -141,6 +167,7 @@ public class WavePortfolio implements EntryPoint {
 	 * This is the entry point method.
 	 */
 
+	/*
 	public void onModuleLoad() {
 
 		try{
@@ -170,7 +197,8 @@ public class WavePortfolio implements EntryPoint {
 			handleError(e);
 		}
 	}
-
+	*/
+	
 
 
 
@@ -224,7 +252,7 @@ public class WavePortfolio implements EntryPoint {
 
 			@Override
 			public void execute() {
-				finService.retrievePortfolioNames("vega113@gmail.com", new AsyncCallback<OverviewPortHeader[]>() {
+				finService.retrievePortfolioNames(new AsyncCallback<OverviewPortHeader[]>() {
 					public void onFailure(Throwable error) {
 						Log.warn("Exception in call to finService.retrievePortfolioNames", error);
 						handleError(error);
@@ -395,6 +423,7 @@ public class WavePortfolio implements EntryPoint {
 		@DefaultMessage("{0}  Change: {1}")
 		String cwOverviewPortHeader(String name, String change);
 	}
+	
 
 
 	//	  public native void retrieveOverviewPortHeaders(String url) /*-{
