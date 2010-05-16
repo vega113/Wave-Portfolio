@@ -75,23 +75,26 @@ public class FinanceRetrievePortfolios extends AbstractWavePortfolio {
    * success and failure handlers.
    * Here, the failure handler displays an error message while the
    * success handler calls showData to display the portfolio entries.
+ * @param portfoliosFeedUri The uri of the portfolios feed
    * 
-   * @param portfoliosFeedUri The uri of the portfolios feed
- * @throws CallErrorException 
+   * @throws CallErrorException 
    */
   
-  public void retrievePortfolioNames(String userId, final AsyncCallback<OverviewPortHeader[]> callback) {
+  public void retrievePortfolioNames(final AsyncCallback<OverviewPortHeader[]> callback) {
 	  
 	  if (!GData.isLoaded(GDataSystemPackage.FINANCE)) {
-	    	logStr += "Loading the GData Finance package...";
+	    	Log.debug( "Loading the GData Finance package...");
 	      GData.loadGDataApi(GDATA_API_KEY, new Runnable() {
 	        public void run() {
 	        	  if (User.getStatus(scope) == AuthSubStatus.LOGGED_IN){
 	        		  execretRievePortfolioNames(callback, URI_FINANCE_PORTFOLIOS);
+	        	  }else{
+	        		  Log.debug("User is not logged in: scope -  " + scope + "; status - " + User.getStatus(scope));
 	        	  }
 	        }
 	      }, GDataSystemPackage.FINANCE);
 	    }
+//	  execretRievePortfolioNames(callback, URI_FINANCE_PORTFOLIOS);
 	  
 //	  if (User.getStatus(scope) == AuthSubStatus.LOGGED_IN) {
 //		 
@@ -104,13 +107,17 @@ public class FinanceRetrievePortfolios extends AbstractWavePortfolio {
 private void execretRievePortfolioNames(
 		final AsyncCallback<OverviewPortHeader[]> callback,
 		String portfoliosFeedUri) {
+	Log.debug("enetering execretRievePortfolioNames");
 	service = FinanceService.newInstance("Wave Portfolio 0.01");
+//	service.setUserCredentials("vega113@gmail.com", "soetyr63937");
 //	service.setDeveloperKey("ABQIAAAAbvr6gQH1qmQkeIRFd4m2eRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxRY7y9tpXoGhmuQObT-SLOXXKGXlA");
 //	service.setUserCredentials("vega113@gmail.com", "soetyr63937");
 	service.getPortfolioFeed(portfoliosFeedUri, new PortfolioFeedCallback() {
 		public void onSuccess(PortfolioFeed result) {
+			Log.debug("enetering onSuccess");
 			OverviewPortHeader[] headers = null;
 	        PortfolioEntry[] entries = result.getEntries();
+	        Log.debug("entries length: " + entries.length);
 	        if (entries.length > 0) {
 	        	 headers = new OverviewPortHeader[entries.length];
 	     	    for (int i = 0; i < entries.length; i++) {
@@ -127,6 +134,7 @@ private void execretRievePortfolioNames(
 			
 		}
 	});
+	Log.debug("exiting execretRievePortfolioNames");
 }
   
 	
