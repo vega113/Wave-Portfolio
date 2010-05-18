@@ -1,8 +1,9 @@
-package com.aggfi.portfolio.wave.client.portfolio;
+package com.aggfi.portfolio.wave.client.portfolio.data;
 
 import java.io.Serializable;
 
-public class AbstractPortRow implements Serializable, IAbstractRow {
+
+public abstract class AbstractPortRow implements Serializable, IAbstractRow {
 	/* (non-Javadoc)
 	 * @see com.aggfi.portfolio.wave.client.portfolio.IAbstractRow#getName()
 	 */
@@ -44,5 +45,4 @@ public class AbstractPortRow implements Serializable, IAbstractRow {
 		this.rowNum = rowNum;
 		this.stockId = stockId;
 	}
-
 }

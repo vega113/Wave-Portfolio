@@ -1,26 +1,20 @@
-package com.aggfi.portfolio.wave.client;
+package com.aggfi.portfolio.wave.client.portfolio;
 
 import com.aggfi.portfolio.wave.client.WavePortfolio.CwConstants;
 import com.aggfi.portfolio.wave.client.WavePortfolio.CwMessages;
 import com.aggfi.portfolio.wave.client.format.FormatBigNumbers;
-import com.aggfi.portfolio.wave.client.portfolio.OverviewPortHeader;
-import com.aggfi.portfolio.wave.client.portfolio.OverviewPortRow;
+import com.aggfi.portfolio.wave.client.portfolio.data.OverviewPortHeader;
+import com.aggfi.portfolio.wave.client.portfolio.data.OverviewPortRow;
 import com.aggfi.portfolio.wave.client.portfolio.OverviewTableTemplate;
-//import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.event.logical.shared.OpenEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.DisclosurePanel;
-import com.google.gwt.user.client.ui.Grid;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.RichTextArea.Formatter;
 
 public class DisclosureWidget extends VerticalPanel {
 	
-	  private static final String DW_WIDTH = "550px";
 	/**
 	   * An instance of the constants.
 	   */
@@ -75,7 +69,7 @@ public class DisclosureWidget extends VerticalPanel {
 	    disclosurePanel = createAdvancedForm();
 	    table = new OverviewTableTemplate(constants, messages);
 	    disclosurePanel.add(table);
-	    disclosurePanel.setWidth(DW_WIDTH);
+	    disclosurePanel.setWidth(constants.cwDW_WIDTH());
 	    DecoratorPanel dpanel = new DecoratorPanel();
 	    dpanel.add(disclosurePanel);
 	    this.add(dpanel);
@@ -85,6 +79,10 @@ public class DisclosureWidget extends VerticalPanel {
 	  
 	  public void setOpenHandler(OpenHandler<DisclosurePanel> oHandler){
 		  disclosurePanel.addOpenHandler(oHandler);
+	  }
+	  
+	  public void setCloseHandler(CloseHandler<DisclosurePanel> cHandler){
+		  disclosurePanel.addCloseHandler(cHandler);
 	  }
 	  
 	  public void portPopulate(OverviewPortRow[] result){

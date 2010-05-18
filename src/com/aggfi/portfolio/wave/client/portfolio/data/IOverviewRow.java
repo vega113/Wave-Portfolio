@@ -1,4 +1,4 @@
-package com.aggfi.portfolio.wave.client.portfolio;
+package com.aggfi.portfolio.wave.client.portfolio.data;
 
 public interface IOverviewRow  extends IAbstractRow{
 
@@ -10,7 +10,7 @@ public interface IOverviewRow  extends IAbstractRow{
 
 	public abstract long getMktCap();
 
-	public abstract long getVolume();
+	public abstract double getVolume();
 
 	public abstract double getOpen();
 

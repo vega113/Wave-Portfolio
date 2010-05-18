@@ -1,5 +1,5 @@
 
-package com.aggfi.portfolio.wave.client.finance;
+package com.aggfi.portfolio.wave.client.finance.feature;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;

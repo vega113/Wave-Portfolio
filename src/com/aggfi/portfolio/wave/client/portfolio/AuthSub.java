@@ -1,4 +1,4 @@
-package com.aggfi.portfolio.wave.client.finance;
+package com.aggfi.portfolio.wave.client.portfolio;
 
 import com.google.gwt.accounts.client.AuthSubStatus;
 import com.google.gwt.accounts.client.User;

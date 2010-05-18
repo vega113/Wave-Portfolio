@@ -14,7 +14,7 @@ public class FormatBigNumbers {
 	CwConstants constants;
 	CwMessages messages;
 	
-	public String format(long bnum){
+	public String format(double bnum){
 		String[] curMult = {"", constants.cwThousand(), constants.cwMillion(), constants.cwBillion()};
 		int counter = 0;
 		NumberFormat fmt = NumberFormat.getFormat("###.##");

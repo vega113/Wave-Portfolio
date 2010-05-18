@@ -22,9 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.aggfi.portfolio.wave.client.portfolio.IOverviewRow;
-import com.aggfi.portfolio.wave.client.portfolio.OverviewPortHeader;
-import com.aggfi.portfolio.wave.client.portfolio.OverviewPortRow;
+import com.aggfi.portfolio.wave.client.portfolio.data.*;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.accounts.client.AuthSubStatus;
 import com.google.gwt.accounts.client.User;
@@ -119,11 +117,18 @@ private void execretRievePortfolioNames(
 	        PortfolioEntry[] entries = result.getEntries();
 	        Log.debug("entries length: " + entries.length);
 	        if (entries.length > 0) {
-	        	 headers = new OverviewPortHeader[entries.length];
-	     	    for (int i = 0; i < entries.length; i++) {
-	     	      PortfolioEntry portfolioEntry = entries[i];
-	     	      headers[i] = buildOverviewPortHeader(portfolioEntry);
-	     	    }
+	        	try{
+
+		        	 headers = new OverviewPortHeader[entries.length];
+		     	    for (int i = 0; i < entries.length; i++) {
+		     	      PortfolioEntry portfolioEntry = entries[i];
+		     	      Log.debug("entry #" + i + ", id : " + portfolioEntry.getId().getValue());
+		     	      headers[i] = buildOverviewPortHeader(portfolioEntry);
+		     	    }
+		        
+	        	}catch (Exception e) {
+	        		Log.error("Failure in execretRievePortfolioNames: ", e);
+				}
 	        } 
 	        callback.onSuccess(headers);
 		}
@@ -139,10 +144,11 @@ private void execretRievePortfolioNames(
   
 	
 	private OverviewPortHeader buildOverviewPortHeader(PortfolioEntry portfolioEntry) {
+		Log.debug("entering buildOverviewPortHeader");
 		OverviewPortHeader header = new OverviewPortHeader();
 		
 		String portfolioId = portfolioEntry.getId().getValue();
-        JsArrayString match = regExpMatch("\\/(\\d+)$", portfolioId);
+//        JsArrayString match = regExpMatch("\\/(\\d+)$", portfolioId);
 //        if (match.length() > 1) {
 //          portfolioId = match.get(1);
 //        }
@@ -170,6 +176,7 @@ private void execretRievePortfolioNames(
 	    double changePercent = cash - portTodayGain != 0 ? portTodayGain/( cash - portTodayGain) : 0;
 	    String portName = portfolioEntry.getTitle().getText();
 	    header.init(portName,portfolioId, portTodayGain,  changePercent, portTodayGain);
+	    Log.debug("Exiting buildOverviewPortHeader");
 	    return header;
 	  }
 	
@@ -259,51 +266,11 @@ private void execretRievePortfolioNames(
 				    		
 				    		//now make a request to retrieve market data
 
-							retrieveMarketDataPerRow(callback, row);
+//							retrieveMarketDataPerRow(callback, row);
 			        	}
 			        }
 			}
 
-			private void retrieveMarketDataPerRow(
-					final AsyncCallback<OverviewPortRow[]> callback,
-					final OverviewPortRow row) {
-				String url;
-				String urlFmt = "http://www.google.com/finance/info?client=ig&q=";
-				 url = URL.encode(urlFmt + row.getSymbol());
-				    // Send request to server and catch any errors.
-				    RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, url);
-
-				    try {
-				      Request request = builder.sendRequest(null, new RequestCallback() {
-				        public void onError(Request request, Throwable exception) {
-				        	Log.error("Couldn't retrieve JSON, request Failed");
-				        	callback.onFailure(exception);
-				        }
-
-				        public void onResponseReceived(Request request, Response response) {
-				        	if (200 == response.getStatusCode()) {
-				        		//construct row and call the callback.onSuccess
-					        	OverviewPortRow[] rows2Update = new OverviewPortRow[1];
-					        	JsArray<GoogleStockDataJS> gStockDataJS =  asArrayOfStockData(com.google.gwt.core.client.JsonUtils.unsafeEval(response.getText()));
-					        	
-					        	GoogleStockDataJS stockData = gStockDataJS.get(0);
-
-					        	double lastPrice = stockData.getLastPrice();
-					        	
-					        	row.initOverviewPortRow(lastPrice, -1, -1, -1, -1, -1, -1, -1, null, null, -1 , null);
-					    		 rows2Update[1] = row;
-					    		callback.onSuccess(rows2Update);
-					          } else {
-					        	  Log.error("Couldn't retrieve JSON (" + response.getStatusText()+ ")" + " Status is: " + response.getStatusCode());
-					          }
-				        }
-
-				      });
-				    } catch (RequestException e) {
-				    	Log.error("Couldn't retrieve JSON");
-				    }
-			}
-			
 			@Override
 			public void onFailure(CallErrorException caught) {
 				Log.error("Failure in getPositions: ", caught);
@@ -321,13 +288,6 @@ private void execretRievePortfolioNames(
 	}
 	
 	
-	public void retrStocksPrice(IOverviewRow row, final AsyncCallback<OverviewPortRow[]> callback){
-		//		String urlFmt = "http://www.google.com/finance?q={0}&output=csv";
-		String urlFmt = "http://www.google.com/finance/info?client=ig&q=";
-		final List<HashMap<String,Object>> quotesList = new ArrayList<HashMap<String,Object>> ();
-//		for(OverviewPortRow row : rowsList){}
-	}
-	
 	private String extrctInfo(String responseStr, String strInfo) {
 		int ind = responseStr.indexOf(strInfo) + strInfo.length();
 		String tmp1 = responseStr.substring(ind,responseStr.length());
@@ -335,9 +295,46 @@ private void execretRievePortfolioNames(
 		return info;
 	}
 	
-	private final native JsArray<GoogleStockDataJS> asArrayOfStockData(JavaScriptObject jso) /*-{
-		return jso;
-	}-*/;
-  
+	/*
+	private void retrieveMarketDataPerRow(
+			final AsyncCallback<OverviewPortRow[]> callback,
+			final OverviewPortRow row) {
+		String url;
+		String urlFmt = "http://www.google.com/finance/info?client=ig&q=";
+		 url = URL.encode(urlFmt + row.getSymbol());
+		    // Send request to server and catch any errors.
+		    RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, url);
+
+		    try {
+		      Request request = builder.sendRequest(null, new RequestCallback() {
+		        public void onError(Request request, Throwable exception) {
+		        	Log.error("Couldn't retrieve JSON, request Failed");
+		        	callback.onFailure(exception);
+		        }
+
+		        public void onResponseReceived(Request request, Response response) {
+		        	if (200 == response.getStatusCode()) {
+		        		//construct row and call the callback.onSuccess
+			        	OverviewPortRow[] rows2Update = new OverviewPortRow[1];
+			        	JsArray<GoogleStockDataJS> gStockDataJS =  asArrayOfStockData(com.google.gwt.core.client.JsonUtils.unsafeEval(response.getText()));
+			        	
+			        	GoogleStockDataJS stockData = gStockDataJS.get(0);
+
+			        	double lastPrice = stockData.getLastPrice();
+			        	
+			        	row.initOverviewPortRow(lastPrice, -1, -1, -1, -1, -1, -1, -1, null, null, -1 , null);
+			    		 rows2Update[1] = row;
+			    		callback.onSuccess(rows2Update);
+			          } else {
+			        	  Log.error("Couldn't retrieve JSON (" + response.getStatusText()+ ")" + " Status is: " + response.getStatusCode());
+			          }
+		        }
+
+		      });
+		    } catch (RequestException e) {
+		    	Log.error("Couldn't retrieve JSON");
+		    }
+	}
+	*/
 	  
 }

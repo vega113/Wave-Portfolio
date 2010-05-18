@@ -1,4 +1,4 @@
-package com.aggfi.portfolio.wave.client.finance;
+package com.aggfi.portfolio.wave.client.finance.feature;
 
 import com.google.gwt.gadgets.client.GadgetFeature.FeatureName;
 

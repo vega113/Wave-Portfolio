@@ -1,5 +1,5 @@
 
-package com.aggfi.portfolio.wave.client.finance;
+package com.aggfi.portfolio.wave.client.finance.feature;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -48,12 +48,8 @@ public class FinanceFeature implements GadgetFeature {
 //
 //
   public native Quote initQuoteInstance() /*-{
-  		return $wnd.quote;
+  		return new google.finance.Quote();
  	}-*/;
-  
-  public native JavaScriptObject initFinance() /*-{
-	return $wnd.google.finance;
-}-*/;
   
   public Quote getQuoteInstance(){
 	  if(quote == null){
@@ -80,9 +76,9 @@ public class FinanceFeature implements GadgetFeature {
   /**
    * Register the stateUpdated method to be called when the state is updated.
    */
-  private native void registerQuoteStateUpdateCallback() /*-{
-   $wnd.quote.addListener(@com.aggfi.portfolio.wave.client.finance.FinanceFeature::quoteUpdateEvent(Lcom/google/gwt/core/client/JavaScriptObject;));
-  }-*/;
+  private  void registerQuoteStateUpdateCallback() {
+   getQuoteInstance().addListener();
+  };
 
   /**
    * This method is called from the wave JavaScript library on Mode changes.

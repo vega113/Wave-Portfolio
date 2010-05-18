@@ -1,4 +1,10 @@
-package com.aggfi.portfolio.wave.client.portfolio;
+package com.aggfi.portfolio.wave.client.portfolio.data;
+
+
+import com.aggfi.portfolio.wave.client.finance.feature.Data;
+import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 	
@@ -12,7 +18,7 @@ public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 	private double changeAbsVal;
 	private double changePercent;
 	private long mktCap;
-	private long volume;
+	private double volume;
 	private double open;
 	private double high;
 	private double low;
@@ -37,6 +43,10 @@ public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 		this.daysGain = daysGain;
 		this.shares = shares;
 		
+		calcInfo();
+	}
+
+	private void calcInfo() {
 		if(lastPrice != 0 && lastPrice > -1){
 			this.changePercent = (daysGain / lastPrice) / 100;
 		}
@@ -93,7 +103,7 @@ public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 	 * @see com.aggfi.portfolio.wave.client.portfolio.IOverviewRow#getMktCap()
 	 */
 	public long getMktCap() {
-		return mktCap;
+		return this.mktCap;
 	}
 	public void setMktCap(long mktCap) {
 		this.mktCap = mktCap;
@@ -101,10 +111,10 @@ public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 	/* (non-Javadoc)
 	 * @see com.aggfi.portfolio.wave.client.portfolio.IOverviewRow#getVolume()
 	 */
-	public long getVolume() {
-		return volume;
+	public double getVolume() {
+		return this.volume;
 	}
-	public void setVolume(long volume) {
+	public void setVolume(double volume) {
 		this.volume = volume;
 	}
 	/* (non-Javadoc)
@@ -120,7 +130,7 @@ public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 	 * @see com.aggfi.portfolio.wave.client.portfolio.IOverviewRow#getHigh()
 	 */
 	public double getHigh() {
-		return high;
+		return this.high;
 	}
 	public void setHigh(double high) {
 		this.high = high;
@@ -129,7 +139,7 @@ public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 	 * @see com.aggfi.portfolio.wave.client.portfolio.IOverviewRow#getLow()
 	 */
 	public double getLow() {
-		return low;
+		return this.low;
 	}
 	public void setLow(double low) {
 		this.low = low;
@@ -138,7 +148,7 @@ public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 	 * @see com.aggfi.portfolio.wave.client.portfolio.IOverviewRow#getDaysGain()
 	 */
 	public double getDaysGain() {
-		return daysGain;
+		return this.daysGain;
 	}
 	public void setDaysGain(double daysGain) {
 		this.daysGain = daysGain;
@@ -147,13 +157,39 @@ public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 	 * @see com.aggfi.portfolio.wave.client.portfolio.IOverviewRow#getCurrencyCode()
 	 */
 	public String getCurrencyCode() {
-		return currencyCode;
+		return this.currencyCode;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aggfi.portfolio.wave.client.portfolio.IOverviewRow#isCashRow()
 	 */
 	public boolean isCashRow() {
-		return isCashRow;
+		return this.isCashRow;
+	}
+
+	@Override
+	public AsyncCallback<Data> getCallback() {
+		return new AsyncCallback<Data>() {
+
+			@Override
+			public void onSuccess(Data result) {
+				if(result.getSymbol().equals(getSymbol())){
+					setLastPrice(result.getLast());
+					setHigh(result.getHigh());
+					setLow(result.getLow());
+					setOpen(result.getOpen());
+					NumberFormat fmt = NumberFormat.getDecimalFormat();
+					double vol = fmt.parse(result.getVolume());
+					setVolume( vol);
+					Log.debug("symbol: " + result.getSymbol() + ", last: " + result.getLast() + ", " + ", open: " + result.getOpen()+  ", high: " + result.getHigh() + ", " +  "low: " + result.getLow() + ", volume: " + vol + ", ext volume: " + result.getExtVolume());
+					calcInfo();
+				}
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+
+			}
+		};
 	}
 }

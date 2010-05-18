@@ -1,4 +1,4 @@
-package com.aggfi.portfolio.wave.client.portfolio;
+package com.aggfi.portfolio.wave.client.portfolio.data;
 
 import java.io.Serializable;
 
