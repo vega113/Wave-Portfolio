@@ -2,7 +2,7 @@ package com.aggfi.portfolio.wave.client.finance;
 
 import com.google.gwt.core.client.JsArrayString;
 
-public class AbstractWavePortfolio {
+public class AbstractRetrievePortfolio {
 	protected static String GDATA_API_KEY = "ABQIAAAAbvr6gQH1qmQkeIRFd4m2eRQGgUfFXBTwJSrdXmAUVcxdpVrjSxSCpKc56TMohMx09fePLmfMFkr2VA";
 	/**
 	   * Expose the JavaScript regular expression parsing to GWT.

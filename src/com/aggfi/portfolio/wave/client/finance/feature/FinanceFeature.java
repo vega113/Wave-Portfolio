@@ -51,7 +51,7 @@ public class FinanceFeature implements GadgetFeature {
   		return new google.finance.Quote();
  	}-*/;
   
-  public Quote getQuoteInstance(){
+  public synchronized Quote getQuoteInstance(){
 	  if(quote == null){
 		  quote = initQuoteInstance();
 	  }
