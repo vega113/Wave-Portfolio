@@ -30,6 +30,7 @@ import com.google.gwt.i18n.client.Constants;
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.DisclosurePanel;
@@ -41,16 +42,13 @@ import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */ 
-@ModulePrefs(title = "WavePortfolio 24",author="Yuri Zelikov",author_email="vega113@aggfi.com", width = 550, height=800 )
+@ModulePrefs(title = "Aggfi Portfolio",author="Yuri Zelikov",author_email="vega113@aggfi.com", width = 550, height=800 )
 //public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsFinance{
 //	public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsRpc, NeedsIntrinsics {
 //public class WavePortfolio implements EntryPoint {
 public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynamicHeight , NeedsFinance{
 
 	//
-	private String portUserName = "Yuri";
-	private String portUserId = "Yuri";
-
 	/**
 	 * An instance of the constants.
 	 */
@@ -72,9 +70,9 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		try{
 
 			RootPanel.get().setWidth("450px");
-			dock = new FinanceDockPanel(constants,messages,portUserName,TAB_PANEL_WIDTH);
-			dhf.getContentDiv().add(dock);
-			dhf.getContentDiv().add(new AuthSub());
+			dock = new FinanceDockPanel(constants,messages,TAB_PANEL_WIDTH);
+			dynHightFeature.getContentDiv().add(dock);
+			dynHightFeature.getContentDiv().add(new AuthSub());
 		}catch(Exception e){
 			handleError(e);
 		}
@@ -87,20 +85,30 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 
 		try{
 			populatePortfolioNames(dock.getLayoutOverview());
-			DeferredCommand.addCommand(new Command() {
-				
-				@Override
-				public void execute() {
-					for(DisclosureWidget dsWidget : dsOverviewList){
-						refreshOverviewPortData(dsWidget);
-					}
-					
-				}
-			});
+			
+			//schedule positions refresh - each  second
+//			 Timer t = new Timer() {
+//			      public void run() {
+//			    	  Log.debug("In timer");
+//			    	  DeferredCommand.addCommand(new Command() {
+//							@Override
+//							public void execute() {
+//								for(DisclosureWidget dsWidget : dsOverviewList){
+//									if(!dsWidget.isClosed()){
+//										refreshOverviewPortData(dsWidget);
+//									}
+//								}
+//							}
+//						});
+//			      }
+//			    };
+
+			    // Schedule the timer to run once in 5 seconds.
+//			    t.scheduleRepeating(1000);
 		}catch(Exception e){
 			handleError(e);
 		}
-		dhf.adjustHeight();
+		dynHightFeature.adjustHeight();
 //		getWave().addStateUpdateEventHandler(new StateUpdateEventHandler() {
 //			@Override
 //			public void onUpdate(StateUpdateEvent event) {
@@ -119,18 +127,19 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 	}
 
 
-	protected DynamicHeightFeature dhf = null;
+	protected DynamicHeightFeature dynHightFeature = null;
 	@Override
 	public void initializeFeature(DynamicHeightFeature feature) {
-		dhf= feature;
+		dynHightFeature= feature;
 
 	}
 	
-	private FinanceFeature fh;
+	private FinanceFeature financeFearure;
 	@Override
 	public void initializeFeature(FinanceFeature feature) {
 		Log.debug("initialized finance feature: " +feature.toString() + ", quote: " + feature.getQuoteInstance().toString());
-		this.fh = feature;
+		this.financeFearure = feature;
+		financeFearure.addQuoteUpdateEventHandler(quoteUpdateEventHandler);
 	}
 
 	
@@ -182,6 +191,7 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 			public void onSuccess(OverviewPortHeader[] portHeaders) {
 				Log.debug("Success on finService.retrievePortfolioNames");
 				dsOverviewList = displayPortfolioNames(portHeaders,layout);
+				dynHightFeature.adjustHeight();
 			}
 		});
 		Log.debug("Exiting populatePortfolioNames" );
@@ -194,7 +204,7 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		List<DisclosureWidget> dsList = new ArrayList<DisclosureWidget>();
 		for(OverviewPortHeader portHeader : portHeaders){
 			cellFormatter.setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_LEFT);
-			final DisclosureWidget dsWidget = new DisclosureWidget(constants,messages,portUserId,portHeader);
+			final DisclosureWidget dsWidget = new DisclosureWidget(constants,messages,portHeader);
 			dsWidget.setOpenHandler(new OpenHandler<DisclosurePanel> () {
 
 				@Override
@@ -203,7 +213,8 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 						@Override
 						public void execute() {
 							refreshOverviewPortData(dsWidget);
-							dhf.adjustHeight();
+							dynHightFeature.adjustHeight();
+							dsWidget.setClosed(false);
 						}
 					});
 				}
@@ -213,7 +224,8 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 				
 				@Override
 				public void onClose(CloseEvent<DisclosurePanel> event) {
-					dhf.adjustHeight();
+					dynHightFeature.adjustHeight();
+					dsWidget.setClosed(true);
 				}
 			});
 			layout.setWidget(counter, 0, dsWidget);
@@ -222,43 +234,76 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		}
 		return dsList;
 	}
+	
+	QuoteUpdateEventHandlerImpl quoteUpdateEventHandler = new QuoteUpdateEventHandlerImpl();
+	class QuoteUpdateEventHandlerImpl implements QuoteUpdateEventHandler
+	 {
+		private OverviewPortRow[] result;
+		private Iterable<AsyncCallback<Data>> callbacksList;
+		
+		public void setResult(OverviewPortRow[] result) {
+			this.result = result;
+		}
 
+		public void setCallbacksList(Iterable<AsyncCallback<Data>> callbacksList) {
+			this.callbacksList = callbacksList;
+		}
+
+		public void setDsWidget(DisclosureWidget dsWidget) {
+			this.dsWidget = dsWidget;
+		}
+
+		private DisclosureWidget dsWidget;
+
+		@Override
+		public void onUpdate(QuoteUpdateEvent event) {
+			try {
+				for(AsyncCallback<Data> callback : callbacksList){
+					callback.onSuccess(event.getData());
+				}
+				dsWidget.portPopulate( result);
+			} catch (Exception e) {
+				Log.error("in callback", e);
+			}
+		}
+	};
+	
+	OverviewAsyncCallbackImpl overviewCallback = new OverviewAsyncCallbackImpl();
+	class OverviewAsyncCallbackImpl implements AsyncCallback<OverviewPortRow[]>{
+		
+		private DisclosureWidget dsWidget;
+
+		public void setDsWidget(DisclosureWidget dsWidget) {
+			this.dsWidget = dsWidget;
+		}
+
+		@Override
+		public void onSuccess(final OverviewPortRow[] result) {
+			
+			// now create list of symbols
+			final List<AsyncCallback<Data>> callbacksList = new ArrayList<AsyncCallback<Data>>();
+			for(OverviewPortRow row : result){
+				symbolsList.add(row.getSymbol());
+				callbacksList.add(row.getCallback());
+			}
+			quoteUpdateEventHandler.setCallbacksList(callbacksList);
+			quoteUpdateEventHandler.setDsWidget(dsWidget);
+			quoteUpdateEventHandler.setResult(result);
+			financeFearure.getQuoteInstance().getQuotes(symbolsList.toArray(new String[1]));
+		}
+
+		@Override
+		public void onFailure(Throwable caught) {
+			Log.error("Error in DsWidget callback! ", caught);
+		}
+	};
+
+	List<String> symbolsList = new ArrayList<String>();
 	private void refreshOverviewPortData(final DisclosureWidget dsWidget) {
 		Log.debug("before: refreshOverviewPortData");
-		finService.retrievePortfolioOverview(dsWidget.getPortId(),  new AsyncCallback<OverviewPortRow[]>() {
-
-			@Override
-			public void onSuccess(final OverviewPortRow[] result) {
-				
-				// now create list of symbols
-				List<String> symbolsList = new ArrayList<String>();
-				final List<AsyncCallback<Data>> callbacksList = new ArrayList<AsyncCallback<Data>>();
-				for(OverviewPortRow row : result){
-					symbolsList.add(row.getSymbol());
-					callbacksList.add(row.getCallback());
-				}
-				fh.addQuoteUpdateEventHandler(new QuoteUpdateEventHandler() {
-					@Override
-					public void onUpdate(QuoteUpdateEvent event) {
-						try {
-							for(AsyncCallback<Data> callback : callbacksList){
-								callback.onSuccess(event.getData());
-							}
-							dsWidget.portPopulate( result);
-						} catch (Exception e) {
-							Log.error("in callback", e);
-						}
-					}
-				});
-				fh.getQuoteInstance().getQuotes(symbolsList.toArray(new String[1]));
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Log.error("Error in DsWidget callback! ", caught);
-			}
-		});
-		
+		symbolsList.clear();
+		overviewCallback.setDsWidget(dsWidget);
+		finService.retrievePortfolioOverview(dsWidget.getPortId(), dsWidget.getCash(), constants.cwCash(),  overviewCallback);
 		Log.debug("after: refreshOverviewPortData");
 	} 
 
@@ -317,6 +362,9 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 
 		@DefaultStringValue(value = "Transactions")
 		String cwTransactions();
+		
+		@DefaultStringValue(value = "Cash")
+		String cwCash();
 
 		//---------------------------------- Big number Abbreviations
 		@DefaultStringValue(value = "K")
@@ -367,8 +415,8 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		 * @param Username
 		 * @return a welcome message for user
 		 */
-		@DefaultMessage("{0} for {1}")
-		String portfoliosFor(String portfolios, String  userName);
+		@DefaultMessage("Google Finance Portfolios")
+		String portfolios();
 
 		/**
 		 * @param abs - absolute change in portfolio value 
@@ -382,10 +430,12 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		 * 
 		 * @param name
 		 * @param change
+		 * @param cash  - Portfolio cash
+		 * @param costBasis  - the total portfolio market value
 		 * @return Whole overview portfolio header
 		 */
-		@DefaultMessage("{0}  Change: {1}")
-		String cwOverviewPortHeader(String name, String change);
+		@DefaultMessage("| {0}|  Change: {1}, Total Mkt Value: {2}")
+		String cwOverviewPortHeader(String name, String change, String mktVakue);
 	}
 	
 

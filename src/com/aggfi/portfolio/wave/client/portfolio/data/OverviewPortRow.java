@@ -6,7 +6,7 @@ import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
+public class OverviewPortRow extends AbstractPortRow{
 	
 	
 
@@ -26,6 +26,8 @@ public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 	private double shares;
 	
 	private String currencyCode;
+
+	private String cash;
 	
 	public void initOverviewPortRow(double lastPrice, double shares, long mktCap,
 			long volume, double open, double high, double low, double daysGain,
@@ -55,11 +57,11 @@ public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 		}
 	}
 	
-	public void initCashOverviewPortRow(double lastPrice, String cashStr, String currencyCode){
+	public void initCashOverviewPortRow(String cashStrVal, String cashTitle, int rowNum ){
 		isCashRow = true;
-		this.lastPrice = lastPrice;
-		this.currencyCode = currencyCode;
-		this.name = cashStr;
+		this.cash = cashStrVal;
+		this.symbol = cashTitle;
+		this.rowNum = rowNum;
 		
 	}
 	
@@ -165,6 +167,10 @@ public class OverviewPortRow extends AbstractPortRow implements IOverviewRow {
 	 */
 	public boolean isCashRow() {
 		return this.isCashRow;
+	}
+
+	public String getCash() {
+		return cash;
 	}
 
 	@Override

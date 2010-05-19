@@ -12,7 +12,7 @@ public class FinanceDockPanel extends DockPanel {
 	
 	private FlexTable layoutOverview;
 
-	public FinanceDockPanel(CwConstants constants, CwMessages messages, String portUserName, String TAB_PANEL_WIDTH) {
+	public FinanceDockPanel(CwConstants constants, CwMessages messages, String TAB_PANEL_WIDTH) {
 		Log.debug("Entering createWidgetPanel");
 		final FlexTable layout = new FlexTable();
 
@@ -25,7 +25,7 @@ public class FinanceDockPanel extends DockPanel {
 		dock.setHorizontalAlignment(DockPanel.ALIGN_CENTER);
 
 
-		HTML welcomeStr = new HTML(messages.portfoliosFor( constants.cwPortfolio(),portUserName));
+		HTML welcomeStr = new HTML(messages.portfolios());
 		dock.add(welcomeStr, DockPanel.NORTH);
 
 		//create tab panel

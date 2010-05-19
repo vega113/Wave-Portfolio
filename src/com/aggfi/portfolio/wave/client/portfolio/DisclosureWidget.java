@@ -26,33 +26,42 @@ public class DisclosureWidget extends VerticalPanel {
 	protected DisclosurePanel disclosurePanel;
 	private boolean isPortRetrieved = false;
 	private OverviewTableTemplate table = null;
+	/**
+	 * this day 'gain'
+	 */
 	private double changeAbsVal;
+	/**
+	 * this day change or gain in per cent
+	 */
 	private double changePercent;
 	private String header;
-	private double gain;
 	
 	private FormatBigNumbers fmtBig;
-	
-	private String formatPortHeader(String name, String portId, double changeAbsVal, double changePercent, double gain, CwConstants constants, CwMessages messages ){
-		String headerStr = fmtBig.formatChange(changeAbsVal, changePercent, messages);
-		NumberFormat nfmt3 = NumberFormat.getFormat("########.##");
-		String sign3 = gain < 0 ? "" : "+";
-		String gainStr = sign3 + nfmt3.format(gain);
-		return messages.cwOverviewPortHeader(name, headerStr);
+	private String cash;
+	public String getCash() {
+		return cash;
 	}
 
-	  public DisclosureWidget(CwConstants constants, CwMessages messages, String userId, OverviewPortHeader portHeader) {
+	private double mktValue;
+	private boolean isClosed;
+	
+	private String formatPortHeader(String name, String portId, double changeAbsVal, double changePercent, double mktValue, CwConstants constants, CwMessages messages ){
+		String headerStr = fmtBig.formatChange(changeAbsVal, changePercent, messages);
+		return messages.cwOverviewPortHeader(name, headerStr, NumberFormat.getCurrencyFormat().format(mktValue));
+	}
+
+	  public DisclosureWidget(CwConstants constants, CwMessages messages, OverviewPortHeader portHeader) {
 		  super();
 		  this.constants = constants;
 		  this.messages  = messages;
 		  this.fmtBig = new FormatBigNumbers(constants, messages);
-		  this.userId = userId;
 		  this.portName = portHeader.getPortName();
 		  this.changeAbsVal = portHeader.getChangeAbsVal();
 		  this.changePercent = portHeader.getChangePercent();
-		  this.gain = portHeader.getGain();
 		  this.portId = portHeader.getPortId();
-		  this.header = formatPortHeader(portName, portId, changeAbsVal, changePercent,gain, constants, messages);
+		  this.cash = NumberFormat.getCurrencyFormat().format(portHeader.getCash());
+		  this.mktValue = portHeader.getMktValue();
+		  this.header = formatPortHeader(portName, portId, changeAbsVal, changePercent, mktValue, constants, messages);
 		  onInitialize();
 	}
 
@@ -142,6 +151,14 @@ public class DisclosureWidget extends VerticalPanel {
 
 	public String getUserId() {
 		return userId;
+	}
+
+	public boolean isClosed() {
+		return isClosed;
+	}
+	public void setClosed(boolean b) {
+		this.isClosed = b;
+		
 	}
 
 

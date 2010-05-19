@@ -4,7 +4,16 @@ import java.io.Serializable;
 
 
 public class OverviewPortHeader implements Serializable {
+	public double getCash() {
+		return cash;
+	}
+	public double getMktValue() {
+		return mktValue;
+	}
+
 	private static final int MAX_PORT_NAME_LENGTH = 20;
+	private double cash;
+	private double mktValue;
 	public String getPortName() {
 		return portName;
 	}
@@ -15,7 +24,7 @@ public class OverviewPortHeader implements Serializable {
 		return changePercent;
 	}
 	public void init(String portName, String portId, double changeAbsVal,
-			double changePercent, double gain) {
+			double changePercent, double cash, double mktValue) {
 		StringBuffer name = null;
 		if(portName.length() > MAX_PORT_NAME_LENGTH){
 			name = new StringBuffer(portName.substring(0, MAX_PORT_NAME_LENGTH -1));
@@ -27,15 +36,12 @@ public class OverviewPortHeader implements Serializable {
 			}
 		}
 		
-		this.portName = "| " + name.toString() + " |";
+		this.portName = name.toString();
 		this.changeAbsVal = changeAbsVal;
 		this.changePercent = changePercent;
-		this.gain = gain;
 		this.portId = portId;
-	}
-	
-	public double getGain() {
-		return gain;
+		this.cash = cash;
+		this.mktValue = mktValue;
 	}
 	
 	public String getPortId() {
@@ -46,8 +52,5 @@ public class OverviewPortHeader implements Serializable {
 	private String portId;
 	private double changeAbsVal;
 	private double changePercent;
-	private double gain;
-	
-	
 
 }

@@ -34,7 +34,7 @@ public abstract class AbstractPortRow implements Serializable, IAbstractRow {
 	protected String name;
 	protected String symbol;
 	
-	private int rowNum;
+	protected int rowNum;
 	private String stockId;
 	
 	public void initOverviewPortRow(String name, String symbol, int rowNum, String stockId) {

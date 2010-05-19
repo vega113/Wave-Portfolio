@@ -3,7 +3,7 @@ package com.aggfi.portfolio.wave.client.portfolio;
 import com.aggfi.portfolio.wave.client.WavePortfolio.CwConstants;
 import com.aggfi.portfolio.wave.client.WavePortfolio.CwMessages;
 import com.aggfi.portfolio.wave.client.format.FormatBigNumbers;
-import com.aggfi.portfolio.wave.client.portfolio.data.IOverviewRow;
+import com.aggfi.portfolio.wave.client.portfolio.data.OverviewPortRow;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.dev.util.msg.Formatter;
 import com.google.gwt.i18n.client.Constants;
@@ -38,13 +38,13 @@ public class OverviewTableTemplate extends FlexTable {
 		this.setText(0, 7, constants.cwDaysGain());
 	}
 	
-	public void addRow(IOverviewRow row){
+	public void addRow(OverviewPortRow row){
 		int rowsCount = getRowCount();
 		updateRow(row, rowsCount);
 		
 	}
 
-	public void updateRow(IOverviewRow row, int rowsCount) {
+	public void updateRow(OverviewPortRow row, int rowsCount) {
 		NumberFormat fmtDec2 = NumberFormat.getFormat("######00.00");
 		NumberFormat fmtDec3 = NumberFormat.getFormat("##0.00");
 		
@@ -83,9 +83,8 @@ public class OverviewTableTemplate extends FlexTable {
 			}
 			this.setText(rowsCount, 7, fmtDec3.format(row.getDaysGain()));
 		}else{
-			NumberFormat fmtCur = NumberFormat.getCurrencyFormat(row.getCurrencyCode());
-			this.setText(rowsCount, 0, row.getName());
-			this.setText(rowsCount, 2, fmtCur.format(row.getLastPrice()));
+			this.setText(rowsCount, 0, row.getSymbol());
+			this.setText(rowsCount, 1, row.getCash());
 		}
 	}
 	

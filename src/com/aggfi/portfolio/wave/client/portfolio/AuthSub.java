@@ -78,25 +78,18 @@ public class AuthSub extends Composite {
    * and for a given system (scope).
    */
   private void showAuthSubStatus() {
-    String[][] systems = new String[][] {
-        
-        new String[] { "Google Finance",
+	  String[] sys  =  { "Google Finance",
             "http://finance.google.com/finance/feeds/",
             "http://waveportfolio.appspot.com/gdata-finance.png",
-            "http://code.google.com/apis/finance/" }
-    };
-    for (int i = 0; i < systems.length; i++) {
-      String[] sys = systems[i];
+            "http://code.google.com/apis/finance/" };
       final String scope = sys[1];
-      mainPanel.insertRow(i);
-      mainPanel.addCell(i);
-      mainPanel.addCell(i);
-      mainPanel.addCell(i);
-      mainPanel.addCell(i);
+      int rowIndex = mainPanel.insertRow(0);
+      mainPanel.addCell(rowIndex);
+      mainPanel.addCell(rowIndex);
+      mainPanel.addCell(rowIndex);
+      mainPanel.addCell(rowIndex);
       Image icon = new Image(sys[2]);
-      mainPanel.setWidget(i, 0, icon);
-//      Label name = new HTML("<a href=\"" + sys[3] + "\">" + sys[0] + "</a>");
-//      mainPanel.setWidget(i, 1, name);
+      mainPanel.setWidget(rowIndex, 0, icon);
       Label statusLabel = new Label();
       Anchor actionLink = new Anchor();
       AuthSubStatus status = User.getStatus(scope);
@@ -117,9 +110,9 @@ public class AuthSub extends Composite {
             User.login(scope);
           }
         });
-      }
-      mainPanel.setWidget(i, 2, statusLabel);
-      mainPanel.setWidget(i, 3, actionLink);
+        mainPanel.setText(rowIndex, 1, "Google Finance");
+      mainPanel.setWidget(rowIndex, 2, statusLabel);
+      mainPanel.setWidget(rowIndex, 3, actionLink);
     }
   }
   
