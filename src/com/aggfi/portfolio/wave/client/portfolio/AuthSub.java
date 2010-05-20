@@ -79,41 +79,36 @@ public class AuthSub extends Composite {
    */
   private void showAuthSubStatus() {
 	  String[] sys  =  { "Google Finance",
-            "http://finance.google.com/finance/feeds/",
-            "http://waveportfolio.appspot.com/gdata-finance.png",
-            "http://code.google.com/apis/finance/" };
-      final String scope = sys[1];
-      int rowIndex = mainPanel.insertRow(0);
-      mainPanel.addCell(rowIndex);
-      mainPanel.addCell(rowIndex);
-      mainPanel.addCell(rowIndex);
-      mainPanel.addCell(rowIndex);
-      Image icon = new Image(sys[2]);
-      mainPanel.setWidget(rowIndex, 0, icon);
-      Label statusLabel = new Label();
-      Anchor actionLink = new Anchor();
-      AuthSubStatus status = User.getStatus(scope);
-      if (status == AuthSubStatus.LOGGED_IN) {
-        statusLabel.setText("Logged in");
-        actionLink.setText("Log out");
-        actionLink.addClickHandler(new ClickHandler() {
-          public void onClick(ClickEvent event) {
-            User.logout(scope);
-            refreshDemo();
-          }
-        });
-      } else if (status == AuthSubStatus.LOGGED_OUT) {
-        statusLabel.setText("Logged out");
-        actionLink.setText("Log in");
-        actionLink.addClickHandler(new ClickHandler() {
-          public void onClick(ClickEvent event) {
-            User.login(scope);
-          }
-        });
-        mainPanel.setText(rowIndex, 1, "Google Finance");
-      mainPanel.setWidget(rowIndex, 2, statusLabel);
-      mainPanel.setWidget(rowIndex, 3, actionLink);
-    }
+			  "http://finance.google.com/finance/feeds/",
+			  "http://waveportfolio.appspot.com/gdata-finance.png",
+	  "http://code.google.com/apis/finance/" };
+	  final String scope = sys[1];
+	  Image icon = new Image(sys[2]);
+	  HTML statusLabel = new HTML();
+	  Anchor actionLink = new Anchor();
+	  AuthSubStatus status = User.getStatus(scope);
+	  if (status == AuthSubStatus.LOGGED_IN) {
+		  statusLabel.setHTML("<i>Logged in</i>");
+		  actionLink.setText("Log out");
+		  actionLink.addClickHandler(new ClickHandler() {
+			  public void onClick(ClickEvent event) {
+				  User.logout(scope);
+				  refreshDemo();
+			  }
+		  });
+	  } else if (status == AuthSubStatus.LOGGED_OUT) {
+		  statusLabel.setHTML("<i>Logged out</i>");
+		  actionLink.setText("Log in");
+		  actionLink.addClickHandler(new ClickHandler() {
+			  public void onClick(ClickEvent event) {
+				  User.login(scope);
+			  }
+		  });
+	  }
+	  mainPanel.setWidget(0, 0, icon);
+	  mainPanel.setWidget(0, 1, statusLabel);
+	  mainPanel.setWidget(0, 2, new HTML("<b>"+ sys[0] + "</b>"));
+	  mainPanel.setWidget(0, 3, actionLink);
   }
   
   /**

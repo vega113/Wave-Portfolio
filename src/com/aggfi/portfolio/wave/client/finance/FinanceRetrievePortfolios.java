@@ -120,25 +120,10 @@ private void execretRievePortfolioNames(
   
 	
 	private OverviewPortHeader buildOverviewPortHeader(PortfolioEntry portfolioEntry) {
-		Log.debug("entering buildOverviewPortHeader");
+		Log.trace("entering buildOverviewPortHeader");
 		OverviewPortHeader header = new OverviewPortHeader();
 		
 		String portfolioId = portfolioEntry.getId().getValue();
-//        JsArrayString match = regExpMatch("\\/(\\d+)$", portfolioId);
-//        if (match.length() > 1) {
-//          portfolioId = match.get(1);
-//        }
-//        getPositions(portfolioId,new PositionFeedCallback() {
-//	      public void onFailure(CallErrorException caught) {
-//	    	  caught.getMessage();
-//	      }
-//	      public void onSuccess(PositionFeed result) {
-//	        PositionEntry[] entries = result.getEntries();
-//	        if (entries.length > 0) {
-//	        	PositionEntry portfolioEntry = entries[0];
-//	        } 
-//	      }
-//	    });
 	    PortfolioData portfolioData = portfolioEntry.getPortfolioData();
 	    MarketValue mv = null;
 	    double costBasis = 0;
@@ -152,101 +137,11 @@ private void execretRievePortfolioNames(
 	    double gain = portfolioData.getGain() != null && portfolioData.getGain().getMoney() != null ? portfolioData.getGain().getMoney()[0].getAmount() : 0;
 	    double cash = mktValue-gain-costBasis;
 	    header.init(portName,portfolioId, portTodayGain,  changePercent, cash, mktValue);
-	    Log.debug("Exiting buildOverviewPortHeader");
+	    Log.trace("Exiting buildOverviewPortHeader");
 	    return header;
 	  }
 	
-	PositionFeedCallbackImpl positionFeedCallbackImpl = new PositionFeedCallbackImpl();
-	class PositionFeedCallbackImpl implements PositionFeedCallback {
-		
-		private AsyncCallback<OverviewPortRow[]> callback;
-		public void setCallback(AsyncCallback<OverviewPortRow[]> callback) {
-			this.callback = callback;
-		}
-
-		public void setCashTitle(String cashTitle) {
-			this.cashTitle = cashTitle;
-		}
-
-		public void setCash(String cash) {
-			this.cash = cash;
-		}
-
-		private String cashTitle;
-		private String cash;
-
-		@Override
-		public void onSuccess(PositionFeed result) {
-			try{
-				OverviewPortRow[] rows = null;
-				PositionEntry[] entries = result.getEntries();
-				if (entries.length == 0) {
-				} else {
-
-					rows = new OverviewPortRow[entries.length];
-					int counter = 0;
-					for(PositionEntry posEntry : entries){
-						int stockNum = counter + 1;
-						//				  	       JsArrayString match = regExpMatch("\\/(\\d+)$", posEntry.getId().getValue());
-						//				  	        if (match.length() > 1) {
-						//				  	        	stockNum = match.get(1);
-						//				  	        }
-						OverviewPortRow row = new OverviewPortRow();
-						PositionData posData =  posEntry.getPositionData();
-
-						double lastPrice = 0;
-						//------- where from do i take volume and mktCap ? //TODO
-						long mktCap = 0;
-						long volume = 0;
-
-						double open = 0;
-						double high = 0;
-						double low = 0;
-
-						String name = posEntry.getTitle().getText();
-						String symbol = posEntry.getSymbol().getSymbol();
-
-						double daysGain = 0;
-						try {
-							daysGain = posData.getDaysGain().getMoney()[0].getAmount();
-						}catch (com.google.gwt.core.client.JavaScriptException e) {
-							Log.warn ("Failure in getPositions: probably no money data for position. ", e);
-						}
-
-						double shares = 0;
-						try {
-							shares = posData.getShares();
-						}catch (com.google.gwt.core.client.JavaScriptException e) {
-							Log.warn ("Failure in getPositions: probably no shares. ",e);
-						}
-						String stockId = posEntry.getId().getValue();
-						row.initOverviewPortRow(lastPrice,shares,mktCap,volume,open,high,low,daysGain,name,symbol,stockNum,stockId);
-						rows[counter] = row;
-						counter++;
-						OverviewPortRow[] rows2Update = new OverviewPortRow[1];
-						rows2Update[0] = row;
-						callback.onSuccess(rows2Update);
-					}
-					//add row with cash
-					int stockNum = counter + 1;
-					OverviewPortRow[] rows2Update = new OverviewPortRow[1];
-					OverviewPortRow row = new OverviewPortRow();
-					row.initCashOverviewPortRow(cash,cashTitle,stockNum);
-					rows2Update[0] = row;
-					callback.onSuccess(rows2Update);
-				}
-			}catch(Exception e){
-				Log.error("positionFeedCallbackImpl.onSuccess Failed! ", e);
-			}
-		}
-
-		@Override
-		public void onFailure(CallErrorException caught) {
-			Log.error("Failure in getPositions: ", caught);
-			
-		}
-	}
-	
+//	PositionFeedCallbackImpl positionFeedCallbackImpl = new PositionFeedCallbackImpl();
 	
 	/**
 	   * Retrieve the positions feed for a given portfolio using the
@@ -256,22 +151,30 @@ private void execretRievePortfolioNames(
 	   * 
 	   * @param portfolioId The id of the portfolio for which to
 	   * retrieve position data
-	 * @param cash 
-	 * @param cashTitle 
+	   * @param cash 
+	   * @param cashTitle 
+	   * @param callback - The callback {@link:OverviewAsyncCallbackImpl}}
 	   */
-	  private void getPositions(final String portfolioId, final String cash, final String cashTitle, final AsyncCallback<OverviewPortRow[]> callback) {
-		  Log.debug("Entering getPositions");
-		  Log.info("portfolioId: " + portfolioId );
+	  private void getPositions(final String portfolioId, final String cash, final String cashTitle, final AsyncCallback<OverviewPortRow> callback) {
+		  Log.trace("Entering getPositions");
+		  Log.debug("portfolioId: " + portfolioId );
 		  String positionsFeedUri = portfolioId+ "/positions?returns=true&transactions=true";
 //	    String positionsFeedUri = portfolioId + "/positions";
+		  PositionFeedCallbackImpl positionFeedCallbackImpl  = PoolFinanceCallbacks.instance().getPositionFeedCallbackImpl(portfolioId);
 		  positionFeedCallbackImpl.setCallback(callback);
 		  positionFeedCallbackImpl.setCash(cash);
 		  positionFeedCallbackImpl.setCashTitle(cashTitle);
 	      service.getPositionFeed(positionsFeedUri, positionFeedCallbackImpl);
 	  }
-
-	public void retrievePortfolioOverview(String portfolioId,
-			String cash,String cashTitle, AsyncCallback<OverviewPortRow[]> asyncCallback) {
+	  
+	  /**
+	   * 
+	   * @param portfolioId
+	   * @param cash
+	   * @param cashTitle
+	   * @param asyncCallback - {@link:OverviewAsyncCallbackImpl}}
+	   */
+	public void retrievePortfolioOverview(String portfolioId,String cash,String cashTitle, AsyncCallback<OverviewPortRow> asyncCallback) {
 		getPositions(portfolioId, cash, cashTitle, asyncCallback);
 	}
 }

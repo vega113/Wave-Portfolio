@@ -13,7 +13,7 @@ public class FinanceDockPanel extends DockPanel {
 	private FlexTable layoutOverview;
 
 	public FinanceDockPanel(CwConstants constants, CwMessages messages, String TAB_PANEL_WIDTH) {
-		Log.debug("Entering createWidgetPanel");
+		Log.trace("Entering createWidgetPanel");
 		final FlexTable layout = new FlexTable();
 
 		layout.setCellSpacing(1);
@@ -25,8 +25,8 @@ public class FinanceDockPanel extends DockPanel {
 		dock.setHorizontalAlignment(DockPanel.ALIGN_CENTER);
 
 
-		HTML welcomeStr = new HTML(messages.portfolios());
-		dock.add(welcomeStr, DockPanel.NORTH);
+//		HTML welcomeStr = new HTML(messages.portfolios());
+//		dock.add(welcomeStr, DockPanel.NORTH);
 
 		//create tab panel
 		DecoratedTabPanel tabPanel = new DecoratedTabPanel();
@@ -49,7 +49,7 @@ public class FinanceDockPanel extends DockPanel {
 		//------------------
 		dock.add(tabPanel, DockPanel.SOUTH);
 
-		Log.debug("Exiting createWidgetPanel");
+		Log.trace("Exiting createWidgetPanel");
 		//add loading image
 		layout.setWidget(0, 0, new HTML("<div><img src='http://www.google.com/ig/images/spinner.gif'>" + constants.cwLoading() + "</div> "));
 		layoutOverview = layout;

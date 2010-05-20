@@ -1,12 +1,16 @@
 package com.aggfi.portfolio.wave.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.aggfi.portfolio.wave.client.finance.FinanceRetrievePortfolios;
+import com.aggfi.portfolio.wave.client.finance.OverviewAsyncCallbackImpl;
+import com.aggfi.portfolio.wave.client.finance.PoolFinanceCallbacks;
 import com.aggfi.portfolio.wave.client.finance.feature.Data;
 import com.aggfi.portfolio.wave.client.finance.feature.FinanceFeature;
 import com.aggfi.portfolio.wave.client.finance.feature.NeedsFinance;
+import com.aggfi.portfolio.wave.client.finance.feature.PoolQuoteHandler;
 import com.aggfi.portfolio.wave.client.finance.feature.QuoteUpdateEvent;
 import com.aggfi.portfolio.wave.client.finance.feature.QuoteUpdateEventHandler;
 import com.aggfi.portfolio.wave.client.portfolio.AuthSub;
@@ -42,7 +46,7 @@ import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */ 
-@ModulePrefs(title = "Aggfi Portfolio",author="Yuri Zelikov",author_email="vega113@aggfi.com", width = 550, height=800 )
+@ModulePrefs(title = "Aggfi Portfolio: powered by Google Finance 1",author="Yuri Zelikov",author_email="vega113@aggfi.com",author_link="http://aggfi.com",  width = 550, height=400 )
 //public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsFinance{
 //	public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsRpc, NeedsIntrinsics {
 //public class WavePortfolio implements EntryPoint {
@@ -87,24 +91,26 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 			populatePortfolioNames(dock.getLayoutOverview());
 			
 			//schedule positions refresh - each  second
-//			 Timer t = new Timer() {
-//			      public void run() {
-//			    	  Log.debug("In timer");
-//			    	  DeferredCommand.addCommand(new Command() {
-//							@Override
-//							public void execute() {
-//								for(DisclosureWidget dsWidget : dsOverviewList){
-//									if(!dsWidget.isClosed()){
-//										refreshOverviewPortData(dsWidget);
-//									}
-//								}
-//							}
-//						});
-//			      }
-//			    };
+			 Timer t = new Timer() {
+			      public void run() {
+			    	  DeferredCommand.addCommand(new Command() {
+							@Override
+							public void execute() {
+								for(DisclosureWidget dsWidget : dsOverviewList){
+									if(!dsWidget.isClosed()){
+										Log.info("dsWidget is: " + dsWidget.isClosed() + ", " + dsWidget.getPortName());
+										refreshOverviewPortData(dsWidget);
+									}else{
+										Log.trace("dsWidget Is closed: " + dsWidget.getPortName());
+									}
+								}
+							}
+						});
+			      }
+			    };
 
 			    // Schedule the timer to run once in 5 seconds.
-//			    t.scheduleRepeating(1000);
+			    t.scheduleRepeating(5000);
 		}catch(Exception e){
 			handleError(e);
 		}
@@ -139,7 +145,6 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 	public void initializeFeature(FinanceFeature feature) {
 		Log.debug("initialized finance feature: " +feature.toString() + ", quote: " + feature.getQuoteInstance().toString());
 		this.financeFearure = feature;
-		financeFearure.addQuoteUpdateEventHandler(quoteUpdateEventHandler);
 	}
 
 	
@@ -189,7 +194,7 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 				handleError(error);
 			}
 			public void onSuccess(OverviewPortHeader[] portHeaders) {
-				Log.debug("Success on finService.retrievePortfolioNames");
+				Log.trace("Success on finService.retrievePortfolioNames");
 				dsOverviewList = displayPortfolioNames(portHeaders,layout);
 				dynHightFeature.adjustHeight();
 			}
@@ -235,76 +240,39 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		return dsList;
 	}
 	
-	QuoteUpdateEventHandlerImpl quoteUpdateEventHandler = new QuoteUpdateEventHandlerImpl();
-	class QuoteUpdateEventHandlerImpl implements QuoteUpdateEventHandler
-	 {
-		private OverviewPortRow[] result;
-		private Iterable<AsyncCallback<Data>> callbacksList;
-		
-		public void setResult(OverviewPortRow[] result) {
-			this.result = result;
-		}
-
-		public void setCallbacksList(Iterable<AsyncCallback<Data>> callbacksList) {
-			this.callbacksList = callbacksList;
-		}
-
-		public void setDsWidget(DisclosureWidget dsWidget) {
-			this.dsWidget = dsWidget;
-		}
-
-		private DisclosureWidget dsWidget;
-
-		@Override
-		public void onUpdate(QuoteUpdateEvent event) {
-			try {
-				for(AsyncCallback<Data> callback : callbacksList){
-					callback.onSuccess(event.getData());
-				}
-				dsWidget.portPopulate( result);
-			} catch (Exception e) {
-				Log.error("in callback", e);
-			}
-		}
-	};
 	
-	OverviewAsyncCallbackImpl overviewCallback = new OverviewAsyncCallbackImpl();
-	class OverviewAsyncCallbackImpl implements AsyncCallback<OverviewPortRow[]>{
-		
-		private DisclosureWidget dsWidget;
-
-		public void setDsWidget(DisclosureWidget dsWidget) {
-			this.dsWidget = dsWidget;
+	protected List<DisclosureWidget> updatePortfolioNames(OverviewPortHeader[] portHeaders, FlexTable layout,List<DisclosureWidget> dsList) {
+		FlexCellFormatter cellFormatter = layout.getFlexCellFormatter();
+		int counter = 0;
+		//create HashMap from List
+		HashMap<String,DisclosureWidget> dsMap = new HashMap<String,DisclosureWidget>();
+		for(DisclosureWidget tempWidget : dsList){
+			dsMap.put(tempWidget.getPortId(), tempWidget);
 		}
-
-		@Override
-		public void onSuccess(final OverviewPortRow[] result) {
-			
-			// now create list of symbols
-			final List<AsyncCallback<Data>> callbacksList = new ArrayList<AsyncCallback<Data>>();
-			for(OverviewPortRow row : result){
-				symbolsList.add(row.getSymbol());
-				callbacksList.add(row.getCallback());
+		for(OverviewPortHeader portHeader : portHeaders){//TODO finish here
+			cellFormatter.setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_LEFT);
+			DisclosureWidget dsWidget = dsMap.get(portHeader.getPortId());
+			if(dsWidget == null){
+				dsWidget = new DisclosureWidget(constants,messages,portHeader);
+				layout.setWidget(counter, 0, dsWidget);
+				dsList.add(dsWidget);
+			}else{
+				dsWidget.updatePortTitle(portHeader);
 			}
-			quoteUpdateEventHandler.setCallbacksList(callbacksList);
-			quoteUpdateEventHandler.setDsWidget(dsWidget);
-			quoteUpdateEventHandler.setResult(result);
-			financeFearure.getQuoteInstance().getQuotes(symbolsList.toArray(new String[1]));
+			counter++;
 		}
-
-		@Override
-		public void onFailure(Throwable caught) {
-			Log.error("Error in DsWidget callback! ", caught);
-		}
-	};
-
-	List<String> symbolsList = new ArrayList<String>();
+		return dsList;
+	}
+	
+	/**
+	 * 
+	 * @param dsWidget
+	 */
 	private void refreshOverviewPortData(final DisclosureWidget dsWidget) {
-		Log.debug("before: refreshOverviewPortData");
-		symbolsList.clear();
-		overviewCallback.setDsWidget(dsWidget);
+		Log.trace("before: refreshOverviewPortData");
+		OverviewAsyncCallbackImpl overviewCallback =PoolFinanceCallbacks.instance().getOverviewAsyncCallbackImpll(dsWidget,financeFearure);
 		finService.retrievePortfolioOverview(dsWidget.getPortId(), dsWidget.getCash(), constants.cwCash(),  overviewCallback);
-		Log.debug("after: refreshOverviewPortData");
+		Log.trace("after: refreshOverviewPortData");
 	} 
 
 
@@ -317,18 +285,7 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 	}
 
 	private void handleError(Throwable error) {
-
-		Log.error(error.getMessage());	
-		Log.error(error.toString());	
-		for(StackTraceElement el : error.getStackTrace()){
-			Log.error(el.toString());
-			Log.trace("Trace: ", error);
-		}
-		if(error instanceof com.google.gwt.user.client.rpc.StatusCodeException){
-			com.google.gwt.user.client.rpc.StatusCodeException ex = (com.google.gwt.user.client.rpc.StatusCodeException)error;
-			Log.error("Status code: " + ex.getStatusCode() + ", Message: " + ex.getMessage() + "from method: " + ex.getStackTrace()[0].getMethodName());
-			Log.trace("Trace: ", ex);
-		}
+		Log.error("Trace: ", error);
 	}
 
 
@@ -342,7 +299,7 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		@DefaultStringValue(value = "500px")
 		String cwDW_WIDTH();
 		
-		@DefaultStringValue(value = "Loading...")
+		@DefaultStringValue(value = "Loading...1")
 		String cwLoading();
 
 		@DefaultStringValue(value = "Portfolios")
@@ -408,6 +365,7 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 
 		@DefaultStringValue(value = "Day's gain")
 		String cwDaysGain();
+
 	}
 	public interface CwMessages extends Messages {
 		/**
@@ -415,7 +373,7 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		 * @param Username
 		 * @return a welcome message for user
 		 */
-		@DefaultMessage("Google Finance Portfolios")
+		@DefaultMessage("Google Finance Portfolios By Aggfi")
 		String portfolios();
 
 		/**
@@ -434,8 +392,16 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		 * @param costBasis  - the total portfolio market value
 		 * @return Whole overview portfolio header
 		 */
-		@DefaultMessage("| {0}|  Change: {1}, Total Mkt Value: {2}")
+		@DefaultMessage("| {0}|  Change: {1}, Mkt Value: {2}")
 		String cwOverviewPortHeader(String name, String change, String mktVakue);
+
+		/**
+		 * 
+		 * @param portName
+		 * @return
+		 */
+		@DefaultMessage("No positions in portfolio: {0}.")
+		String cwNoPositionEntries(String portName);
 	}
 	
 

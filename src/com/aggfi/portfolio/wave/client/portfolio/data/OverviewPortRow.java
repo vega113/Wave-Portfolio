@@ -12,6 +12,17 @@ public class OverviewPortRow extends AbstractPortRow{
 
 
 
+	@Override
+	public String toString() {
+		return "OverviewPortRow [cash=" + cash + ", changeAbsVal="
+				+ changeAbsVal + ", changePercent=" + changePercent
+				+ ", currencyCode=" + currencyCode + ", daysGain=" + daysGain
+				+ ", high=" + high + ", isCashRow=" + isCashRow
+				+ ", lastPrice=" + lastPrice + ", low=" + low + ", mktCap="
+				+ mktCap + ", open=" + open + ", shares=" + shares
+				+ ", volume=" + volume + "]";
+	}
+
 	private boolean isCashRow = false;
 	
 	private double lastPrice;
@@ -187,7 +198,7 @@ public class OverviewPortRow extends AbstractPortRow{
 					NumberFormat fmt = NumberFormat.getDecimalFormat();
 					double vol = fmt.parse(result.getVolume());
 					setVolume( vol);
-					Log.debug("symbol: " + result.getSymbol() + ", last: " + result.getLast() + ", " + ", open: " + result.getOpen()+  ", high: " + result.getHigh() + ", " +  "low: " + result.getLow() + ", volume: " + vol + ", ext volume: " + result.getExtVolume());
+					Log.trace("symbol: " + result.getSymbol() + ", last: " + result.getLast() + ", " + ", open: " + result.getOpen()+  ", high: " + result.getHigh() + ", " +  "low: " + result.getLow() + ", volume: " + vol + ", ext volume: " + result.getExtVolume());
 					calcInfo();
 				}
 			}

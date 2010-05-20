@@ -9,6 +9,7 @@ import com.google.gwt.dev.util.msg.Formatter;
 import com.google.gwt.i18n.client.Constants;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HTML;
 
 public class OverviewTableTemplate extends FlexTable {
 	private CwConstants constants;
@@ -36,6 +37,7 @@ public class OverviewTableTemplate extends FlexTable {
 		this.setText(0, 5, constants.cwHigh());
 		this.setText(0, 6, constants.cwLow());
 		this.setText(0, 7, constants.cwDaysGain());
+		this.setWidget(1, 0, new HTML("<div><img src='http://www.google.com/ig/images/spinner.gif'>" + constants.cwLoading() + "</div> "));
 	}
 	
 	public void addRow(OverviewPortRow row){
@@ -70,7 +72,7 @@ public class OverviewTableTemplate extends FlexTable {
 //			}
 			if (row.getVolume() > -1) {
 				this.setText(rowsCount, 3, fmtBig.format(row.getVolume()));
-				Log.debug("row.getVolume: " + row.getVolume() + ", fmtBig: " +fmtBig.format(row.getVolume()) );
+				Log.trace("row.getVolume: " + row.getVolume() + ", fmtBig: " +fmtBig.format(row.getVolume()) );
 			}
 			if (row.getOpen() > -1) {
 				this.setText(rowsCount, 4, fmtDec2.format(row.getOpen()));
