@@ -34,10 +34,10 @@ public class FinanceDockPanel extends DockPanel {
 		tabPanel.setAnimationEnabled(true);
 
 		// Add a home tab
-		String[] tabTitles = {constants.cwOverview(),constants.cwFundamentals(),constants.cwPerformance(),constants.cwTransactions()};
+		String[] tabTitles = {constants.cwOverview(),constants.cwNews(),constants.cwPerformance(),constants.cwTransactions()};
 		tabPanel.add(layout, tabTitles[0]);
 
-		tabPanel.add(new HTML(constants.cwFundamentals() + ": not Implemented Yet"), tabTitles[1]);
+		tabPanel.add(new HTML(constants.cwNews() + ": not Implemented Yet"), tabTitles[1]);
 
 		tabPanel.add(new HTML(constants.cwPerformance() + ": not Implemented Yet"), tabTitles[2]);
 

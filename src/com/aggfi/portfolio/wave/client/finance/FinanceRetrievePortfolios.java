@@ -83,12 +83,11 @@ public class FinanceRetrievePortfolios extends AbstractRetrievePortfolio {
 private void execretRievePortfolioNames(
 		final AsyncCallback<OverviewPortHeader[]> callback,
 		String portfoliosFeedUri) {
-	Log.debug("enetering execretRievePortfolioNames");
+	Log.trace("enetering execretRievePortfolioNames");
 	service = FinanceService.newInstance("Wave Portfolio 0.01");
 //	service.setDeveloperKey("ABQIAAAAbvr6gQH1qmQkeIRFd4m2eRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxRY7y9tpXoGhmuQObT-SLOXXKGXlA");
 	service.getPortfolioFeed(portfoliosFeedUri, new PortfolioFeedCallback() {
 		public void onSuccess(PortfolioFeed result) {
-			Log.debug("enetering onSuccess");
 			OverviewPortHeader[] headers = null;
 	        PortfolioEntry[] entries = result.getEntries();
 	        Log.debug("entries length: " + entries.length);
@@ -115,7 +114,7 @@ private void execretRievePortfolioNames(
 			
 		}
 	});
-	Log.debug("exiting execretRievePortfolioNames");
+	Log.trace("exiting execretRievePortfolioNames");
 }
   
 	

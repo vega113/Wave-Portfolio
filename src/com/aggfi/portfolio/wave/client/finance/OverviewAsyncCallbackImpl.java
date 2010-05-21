@@ -33,24 +33,28 @@ public class OverviewAsyncCallbackImpl implements AsyncCallback<OverviewPortRow>
 
 	@Override
 	public void onSuccess(final OverviewPortRow row) {
-		List<String> symbolsList = new ArrayList<String>();
-		// now create list of symbols for this portfolio and also collect callbacks for each portfolio row which will be invkoed
-		//when marked data will arrive
-		Log.debug("Inside OverviewAsyncCallbackImpl.onSuccess - creating list of stock symbols and callbacks from row: " + row.getSymbol());
-		if(row == null){ // no entries in portfolio
-			dsWidget.portPopulate(null);
-		}
-		if(!row.isCashRow()){
-			symbolsList.add(row.getSymbol());
-			QuoteUpdateEventHandlerImpl quoteUpdateEventHandler = 
-				PoolQuoteHandler.instance().getQuoteUpdateEventHandler(dsWidget.getPortId(),financeFearure);
-			quoteUpdateEventHandler.setDsWidget(dsWidget);
-			quoteUpdateEventHandler.setResult(row);
-			financeFearure.getQuoteInstance().getQuotes(symbolsList.toArray(new String[1]));
-		}else{
-			OverviewPortRow[] rows = new OverviewPortRow[1];
-			rows[0] = row;
-			dsWidget.portPopulate(rows );
+		try{
+			List<String> symbolsList = new ArrayList<String>();
+			// now create list of symbols for this portfolio and also collect callbacks for each portfolio row which will be invkoed
+			//when marked data will arrive
+			Log.trace("Inside OverviewAsyncCallbackImpl.onSuccess - creating list of stock symbols and callbacks from row: " + row.getSymbol());
+			if(row == null){ // no entries in portfolio
+				dsWidget.portPopulate(null);
+			}
+			if(!row.isCashRow()){
+				symbolsList.add(row.getSymbol());
+				QuoteUpdateEventHandlerImpl quoteUpdateEventHandler = 
+					PoolQuoteHandler.instance().getQuoteUpdateEventHandler(dsWidget.getPortId(),financeFearure);
+				quoteUpdateEventHandler.setDsWidget(dsWidget);
+				quoteUpdateEventHandler.setResult(row);
+				financeFearure.getQuoteInstance().getQuotes(symbolsList.toArray(new String[1]));
+			}else{
+				OverviewPortRow[] rows = new OverviewPortRow[1];
+				rows[0] = row;
+				dsWidget.portPopulate(rows );
+			}
+		}catch(Throwable t){
+			Log.warn("OverviewAsyncCallbackImpl.onSuccess: " +  row ,t);
 		}
 	}
 

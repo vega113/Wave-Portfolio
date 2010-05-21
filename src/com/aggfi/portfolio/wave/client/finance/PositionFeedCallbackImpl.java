@@ -41,13 +41,16 @@ public class PositionFeedCallbackImpl implements PositionFeedCallback {
 			OverviewPortRow[] rows = null;
 			
 			if (result == null || result.getEntries() == null || result.getEntries().length == 0) {
-				callback.onSuccess(null);
+				if(callback != null){
+					callback.onSuccess(null);
+				}
 			} else {
 				PositionEntry[] entries = result.getEntries();
 				rows = new OverviewPortRow[entries.length];
 				int counter = 0;
 				for(PositionEntry posEntry : entries){
-					Log.trace("Looping positions entries: " +posEntry.getId().getValue());
+					String id = posEntry.getId() != null ? posEntry.getId().getValue() : "null in id";
+					Log.info("Looping positions entries: " + id);
 					int stockNum = counter + 1; // +1 it beacause of table header - it's also a row
 					OverviewPortRow row = new OverviewPortRow();
 					PositionData posData =  posEntry.getPositionData();
@@ -61,27 +64,27 @@ public class PositionFeedCallbackImpl implements PositionFeedCallback {
 					double high = 0;
 					double low = 0;
 
-					String name = posEntry.getTitle().getText();
-					String symbol = posEntry.getSymbol().getSymbol();
+					String name = posEntry.getTitle() != null ? posEntry.getTitle().getText() : "null in title";
+					String symbol = posEntry.getSymbol() != null ? posEntry.getSymbol().getSymbol() : "null in symbol";
 
 					double daysGain = 0;
 					try {
 						daysGain = posData.getDaysGain().getMoney()[0].getAmount();
 					}catch (com.google.gwt.core.client.JavaScriptException e) {
-						Log.warn ("Failure in getPositions: probably no money data for position. ", e);
+//						Log.warn (e.getMessage());
 					}
 
 					double shares = 0;
 					try {
 						shares = posData.getShares();
 					}catch (com.google.gwt.core.client.JavaScriptException e) {
-						Log.warn ("Failure in getPositions: probably no shares. ",e);
+//						Log.warn (e.getMessage());
 					}
-					String stockId = posEntry.getId().getValue();
+					String stockId = id;
 					row.initOverviewPortRow(lastPrice,shares,mktCap,volume,open,high,low,daysGain,name,symbol,stockNum,stockId);
 					rows[counter] = row;
 					counter++;
-					Log.debug("Before calling callback.onSuccess : " + row.getSymbol());
+					Log.trace("Before calling callback.onSuccess : " + row.getSymbol());
 					callback.onSuccess(row);
 				}
 				//add row with cash

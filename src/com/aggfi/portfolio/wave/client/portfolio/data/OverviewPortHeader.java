@@ -26,6 +26,7 @@ public class OverviewPortHeader implements Serializable {
 	public void init(String portName, String portId, double changeAbsVal,
 			double changePercent, double cash, double mktValue) {
 		StringBuffer name = null;
+		if(portName == null) portName = "";
 		if(portName.length() > MAX_PORT_NAME_LENGTH){
 			name = new StringBuffer(portName.substring(0, MAX_PORT_NAME_LENGTH -1));
 		}else{

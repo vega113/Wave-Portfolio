@@ -89,7 +89,7 @@ public class AuthSub extends Composite {
 	  AuthSubStatus status = User.getStatus(scope);
 	  if (status == AuthSubStatus.LOGGED_IN) {
 		  statusLabel.setHTML("<i>Logged in</i>");
-		  actionLink.setText("Log out");
+		  actionLink.setText("- Log out");
 		  actionLink.addClickHandler(new ClickHandler() {
 			  public void onClick(ClickEvent event) {
 				  User.logout(scope);
@@ -98,7 +98,7 @@ public class AuthSub extends Composite {
 		  });
 	  } else if (status == AuthSubStatus.LOGGED_OUT) {
 		  statusLabel.setHTML("<i>Logged out</i>");
-		  actionLink.setText("Log in");
+		  actionLink.setText("- Log in");
 		  actionLink.addClickHandler(new ClickHandler() {
 			  public void onClick(ClickEvent event) {
 				  User.login(scope);

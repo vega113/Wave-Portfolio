@@ -14,6 +14,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.DisclosurePanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class DisclosureWidget extends VerticalPanel {
@@ -29,6 +30,10 @@ public class DisclosureWidget extends VerticalPanel {
 	protected DisclosurePanel disclosurePanel;
 	private boolean isPortRetrieved = false;
 	private OverviewTableTemplate table = null;
+	
+	private double mktValue;
+	private boolean isClosed = true;
+	private DisclosurePanel advancedDisclosure;
 	/**
 	 * this day 'gain'
 	 */
@@ -45,9 +50,7 @@ public class DisclosureWidget extends VerticalPanel {
 		return cash;
 	}
 
-	private double mktValue;
-	private boolean isClosed;
-	private DisclosurePanel advancedDisclosure;
+	
 	
 	private String formatPortHeader(String name, String portId, double changeAbsVal, double changePercent, double mktValue){
 		String headerStr = fmtBig.formatChange(changeAbsVal, changePercent, messages);
@@ -104,11 +107,11 @@ public class DisclosureWidget extends VerticalPanel {
 	  
 	  public void portPopulate(OverviewPortRow[] result){
 		  if(result == null){
-			  table.clear();
+			  table.removeAllRows();
 			  table.setText(0, 0, messages.cwNoPositionEntries(getPortName()));
 		  }else{
 			  for(OverviewPortRow row : result){
-				  Log.debug("updating: " + row.toString());
+				  Log.trace("updating: " + row.toString());
 				  table.updateRow(row,row.getRowNum());
 			  }
 		  }
@@ -118,14 +121,15 @@ public class DisclosureWidget extends VerticalPanel {
 	   * Create a form that contains undisclosed advanced options.
 	   */
 	  private DisclosurePanel createAdvancedForm() {
-		  advancedDisclosure = new DisclosurePanel(header);
+		  advancedDisclosure = new DisclosurePanel();
 		  advancedDisclosure.setAnimationEnabled(true);
+		  advancedDisclosure.setHeader(new HTML(("<div>" + header + " Init!" + "</div>")));
 		  return advancedDisclosure;
 	  }
 	  
 	  public void updatePortTitle(OverviewPortHeader portHeader){
 		  portHeader2Members(portHeader);
-		  advancedDisclosure.setTitle(header);
+		  advancedDisclosure.setHeader(new HTML(("<div>" + header + " Updated!" + "</div>")));
 	  }
 
 
@@ -146,7 +150,6 @@ public class DisclosureWidget extends VerticalPanel {
 	}
 
 	public boolean isClosed() {
-		Log.debug("isClosed is acessed: " + isClosed);
 		return isClosed;
 	}
 	public void setClosed(boolean b) {

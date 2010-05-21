@@ -85,14 +85,15 @@ public class OverviewTableTemplate extends FlexTable {
 			}
 			this.setText(rowsCount, 7, fmtDec3.format(row.getDaysGain()));
 		}else{
+			FlexCellFormatter ff = this.getFlexCellFormatter();
 			this.setText(rowsCount, 0, row.getSymbol());
 			this.setText(rowsCount, 1, row.getCash());
+			ff.setColSpan(rowsCount, 1, 2);
 		}
 	}
 	
 	
 	public void clear(){
-		int rowsCount = getRowCount();
 		while(getRowCount() > 1){
 			removeRow(getRowCount()-1);
 		}

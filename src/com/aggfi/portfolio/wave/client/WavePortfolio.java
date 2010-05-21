@@ -46,7 +46,7 @@ import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */ 
-@ModulePrefs(title = "Aggfi Portfolio: powered by Google Finance 1",author="Yuri Zelikov",author_email="vega113@aggfi.com",author_link="http://aggfi.com",  width = 550, height=400 )
+@ModulePrefs(title = "Aggfi Portfolio: powered by Google Finance",author="Yuri Zelikov",author_email="vega113@aggfi.com",author_link="http://aggfi.com",  width = 550, height=400 )
 //public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsFinance{
 //	public class WavePortfolio extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsRpc, NeedsIntrinsics {
 //public class WavePortfolio implements EntryPoint {
@@ -70,47 +70,46 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 	
 	@Override
 	protected void init(UserPreferences preferences) {
-		FinanceDockPanel dock = null;
 		try{
-
-			RootPanel.get().setWidth("450px");
+			FinanceDockPanel dock = null;
+			RootPanel.get().setWidth("0px");
+			RootPanel.get().setHeight("0px");
+			RootPanel.get().setVisible(false);
 			dock = new FinanceDockPanel(constants,messages,TAB_PANEL_WIDTH);
+			final FlexTable layout = dock.getLayoutOverview();
 			dynHightFeature.getContentDiv().add(dock);
 			dynHightFeature.getContentDiv().add(new AuthSub());
-		}catch(Exception e){
-			handleError(e);
-		}
 
-		DeferredCommand.addCommand(new Command() {
-			public void execute() {
-				initRemoteLogger(RootPanel.get());
-			}
-		});
+			DeferredCommand.addCommand(new Command() {
+				public void execute() {
+					initRemoteLogger(RootPanel.get());
+				}
+			});
 
-		try{
 			populatePortfolioNames(dock.getLayoutOverview());
-			
+
 			//schedule positions refresh - each  second
-			 Timer t = new Timer() {
-			      public void run() {
-			    	  DeferredCommand.addCommand(new Command() {
-							@Override
-							public void execute() {
-								for(DisclosureWidget dsWidget : dsOverviewList){
-									if(!dsWidget.isClosed()){
-										Log.info("dsWidget is: " + dsWidget.isClosed() + ", " + dsWidget.getPortName());
-										refreshOverviewPortData(dsWidget);
-									}else{
-										Log.trace("dsWidget Is closed: " + dsWidget.getPortName());
-									}
+			Timer t = new Timer() {
+				public void run() {
+					DeferredCommand.addCommand(new Command() {
+						@Override
+						public void execute() {
+							populatePortfolioNames(layout);
+							for(DisclosureWidget dsWidget : dsOverviewList){
+								if(!dsWidget.isClosed()){
+									Log.info("dsWidget is: " + dsWidget.isClosed() + ", " + dsWidget.getPortName());
+									refreshOverviewPortData(dsWidget);
+								}else{
+									Log.trace("dsWidget Is closed: " + dsWidget.getPortName());
 								}
 							}
-						});
-			      }
-			    };
+						}
+					});
+				}
+			};
 
-			    // Schedule the timer to run once in 5 seconds.
-			    t.scheduleRepeating(5000);
+			// Schedule the timer to run once in 5 seconds.
+			t.scheduleRepeating(5000);
 		}catch(Exception e){
 			handleError(e);
 		}
@@ -195,7 +194,11 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 			}
 			public void onSuccess(OverviewPortHeader[] portHeaders) {
 				Log.trace("Success on finService.retrievePortfolioNames");
-				dsOverviewList = displayPortfolioNames(portHeaders,layout);
+				if(dsOverviewList == null){
+					dsOverviewList = displayPortfolioNames(portHeaders,layout);
+				}else{
+					dsOverviewList = updatePortfolioNames(portHeaders, layout, dsOverviewList);
+				}
 				dynHightFeature.adjustHeight();
 			}
 		});
@@ -243,20 +246,50 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 	
 	protected List<DisclosureWidget> updatePortfolioNames(OverviewPortHeader[] portHeaders, FlexTable layout,List<DisclosureWidget> dsList) {
 		FlexCellFormatter cellFormatter = layout.getFlexCellFormatter();
+		if(dsList == null){
+			dsList = new ArrayList<DisclosureWidget>();
+		}
 		int counter = 0;
 		//create HashMap from List
 		HashMap<String,DisclosureWidget> dsMap = new HashMap<String,DisclosureWidget>();
 		for(DisclosureWidget tempWidget : dsList){
 			dsMap.put(tempWidget.getPortId(), tempWidget);
 		}
-		for(OverviewPortHeader portHeader : portHeaders){//TODO finish here
+		for(OverviewPortHeader portHeader : portHeaders){
 			cellFormatter.setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_LEFT);
 			DisclosureWidget dsWidget = dsMap.get(portHeader.getPortId());
 			if(dsWidget == null){
-				dsWidget = new DisclosureWidget(constants,messages,portHeader);
-				layout.setWidget(counter, 0, dsWidget);
-				dsList.add(dsWidget);
+				Log.info("Adding new portfolio inline! " + portHeader.getPortId());
+				final DisclosureWidget dsWidgetTemp = new DisclosureWidget(constants,messages,portHeader);
+				dsWidgetTemp.setOpenHandler(new OpenHandler<DisclosurePanel> () {
+
+					@Override
+					public void onOpen(OpenEvent<DisclosurePanel> event) {
+						DeferredCommand.addCommand(new Command() {
+							@Override
+							public void execute() {
+								refreshOverviewPortData(dsWidgetTemp);
+								dynHightFeature.adjustHeight();
+								dsWidgetTemp.setClosed(false);
+							}
+						});
+					}
+				});
+				
+				dsWidgetTemp.setCloseHandler(new CloseHandler<DisclosurePanel>() {
+					
+					@Override
+					public void onClose(CloseEvent<DisclosurePanel> event) {
+						dynHightFeature.adjustHeight();
+						dsWidgetTemp.setClosed(true);
+					}
+				});
+				//add new widget - in case something changed while the gadget is running
+				layout.setWidget(counter, 0, dsWidgetTemp);
+				dsList.add(dsWidgetTemp);
+				
 			}else{
+				Log.debug("updating portfolio title: " + portHeader.getPortName());
 				dsWidget.updatePortTitle(portHeader);
 			}
 			counter++;
@@ -280,8 +313,8 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		//		Log.setUncaughtExceptionHandler();
 		if (panel != null) {
 			panel.add (Log.getLogger(DivLogger.class).getWidget());
+			Log.info("Logger initialized: " + Log.class.getName());
 		}
-		Log.info("Logger initialized: " + Log.class.getName());
 	}
 
 	private void handleError(Throwable error) {
@@ -299,7 +332,7 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		@DefaultStringValue(value = "500px")
 		String cwDW_WIDTH();
 		
-		@DefaultStringValue(value = "Loading...1")
+		@DefaultStringValue(value = " Loading...")
 		String cwLoading();
 
 		@DefaultStringValue(value = "Portfolios")
@@ -311,8 +344,8 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		@DefaultStringValue(value = "Overview")
 		String cwOverview();
 
-		@DefaultStringValue(value = "Fundamentals")
-		String cwFundamentals();
+		@DefaultStringValue(value = "News")
+		String cwNews();
 
 		@DefaultStringValue(value = "Performance")
 		String cwPerformance();
@@ -342,7 +375,7 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		@DefaultStringValue(value = "Symbol")
 		String cwSymbol();
 
-		@DefaultStringValue(value = "Last price")
+		@DefaultStringValue(value = "Last")
 		String cwLastPrice();
 
 		@DefaultStringValue(value = "Change")
@@ -363,7 +396,7 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		@DefaultStringValue(value = "High")
 		String cwHigh();
 
-		@DefaultStringValue(value = "Day's gain")
+		@DefaultStringValue(value = "Gain")
 		String cwDaysGain();
 
 	}
