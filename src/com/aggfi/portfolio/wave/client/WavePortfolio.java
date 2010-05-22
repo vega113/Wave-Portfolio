@@ -72,9 +72,9 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 	protected void init(UserPreferences preferences) {
 		try{
 			FinanceDockPanel dock = null;
-			RootPanel.get().setWidth("0px");
-			RootPanel.get().setHeight("0px");
-			RootPanel.get().setVisible(false);
+//			RootPanel.get().setWidth("0px");
+//			RootPanel.get().setHeight("0px");
+//			RootPanel.get().setVisible(false);
 			dock = new FinanceDockPanel(constants,messages,TAB_PANEL_WIDTH);
 			final FlexTable layout = dock.getLayoutOverview();
 			dynHightFeature.getContentDiv().add(dock);
@@ -184,29 +184,43 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 	}
 	
 	*/
+	
+	/**
+	 * Inner class to serve as callback passed to {@link FinanceRetrievePortfolios.retrievePortfolioNames()}
+	 * Set layout field before use
+	 * It's onSuccess method is invoked after retrieval of portfolio feed and construction of portHeaders
+	 * portHeaders are passed to onSuccess
+	 */
+	protected class PopulatePortCallbackImpl implements AsyncCallback<OverviewPortHeader[]> {
+		private FlexTable layout;
+		public void setLayout(FlexTable layout) {
+			this.layout = layout;
+		}
+		public void onFailure(Throwable error) {
+			Log.warn("Exception in call to finService.retrievePortfolioNames", error);
+		}
+		public void onSuccess(OverviewPortHeader[] portHeaders) {
+			Log.debug("Success on finService.retrievePortfolioNames");
+			if(dsOverviewList == null){
+				dsOverviewList = displayPortfolioNames(portHeaders,layout);
+			}else{
+				dsOverviewList = updatePortfolioNames(portHeaders, layout, dsOverviewList);
+			}
+			dynHightFeature.adjustHeight();
+		}
+	}
 
 	protected void populatePortfolioNames(final FlexTable layout) {
-		Log.debug("Entering: populatePortfolioNames" );
-		finService.retrievePortfolioNames(new AsyncCallback<OverviewPortHeader[]>() {
-			public void onFailure(Throwable error) {
-				Log.warn("Exception in call to finService.retrievePortfolioNames", error);
-				handleError(error);
-			}
-			public void onSuccess(OverviewPortHeader[] portHeaders) {
-				Log.trace("Success on finService.retrievePortfolioNames");
-				if(dsOverviewList == null){
-					dsOverviewList = displayPortfolioNames(portHeaders,layout);
-				}else{
-					dsOverviewList = updatePortfolioNames(portHeaders, layout, dsOverviewList);
-				}
-				dynHightFeature.adjustHeight();
-			}
-		});
+		Log.debug("Entering: populatePortfolioNames v2" );
+		PopulatePortCallbackImpl callback = new PopulatePortCallbackImpl();
+		callback.setLayout(layout);
+		finService.retrievePortfolioNames(callback );
 		Log.debug("Exiting populatePortfolioNames" );
 	}
 
 
 	protected List<DisclosureWidget> displayPortfolioNames(OverviewPortHeader[] portHeaders, FlexTable layout) {
+		Log.debug("Entering displayPortfolioNames v2");
 		FlexCellFormatter cellFormatter = layout.getFlexCellFormatter();
 		int counter = 0;
 		List<DisclosureWidget> dsList = new ArrayList<DisclosureWidget>();
@@ -240,11 +254,13 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 			counter++;
 			dsList.add(dsWidget);
 		}
+		Log.debug("Exiting displayPortfolioNames");
 		return dsList;
 	}
 	
 	
 	protected List<DisclosureWidget> updatePortfolioNames(OverviewPortHeader[] portHeaders, FlexTable layout,List<DisclosureWidget> dsList) {
+		Log.debug("Entering updatePortfolioNames");
 		FlexCellFormatter cellFormatter = layout.getFlexCellFormatter();
 		if(dsList == null){
 			dsList = new ArrayList<DisclosureWidget>();
@@ -258,8 +274,8 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 		for(OverviewPortHeader portHeader : portHeaders){
 			cellFormatter.setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_LEFT);
 			DisclosureWidget dsWidget = dsMap.get(portHeader.getPortId());
-			if(dsWidget == null){
-				Log.info("Adding new portfolio inline! " + portHeader.getPortId());
+			if(dsWidget == null){//TODO 
+				Log.warn("Adding new portfolio inline! " + portHeader.getPortId());
 				final DisclosureWidget dsWidgetTemp = new DisclosureWidget(constants,messages,portHeader);
 				dsWidgetTemp.setOpenHandler(new OpenHandler<DisclosurePanel> () {
 
@@ -294,6 +310,7 @@ public class WavePortfolio extends Gadget<UserPreferences> implements NeedsDynam
 			}
 			counter++;
 		}
+		Log.debug("Exiting updatePortfolioNames");
 		return dsList;
 	}
 	

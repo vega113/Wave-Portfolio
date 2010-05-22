@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class DisclosureWidget extends VerticalPanel {
 	
@@ -123,13 +124,14 @@ public class DisclosureWidget extends VerticalPanel {
 	  private DisclosurePanel createAdvancedForm() {
 		  advancedDisclosure = new DisclosurePanel();
 		  advancedDisclosure.setAnimationEnabled(true);
-		  advancedDisclosure.setHeader(new HTML(("<div>" + header + " Init!" + "</div>")));
+		  Widget hWidget = advancedDisclosure.getHeader();
+		  advancedDisclosure.setHeader(new HTML(("<div style='background-color: aqua;'>>" + header + " Init!" + "</div>")));
 		  return advancedDisclosure;
 	  }
 	  
 	  public void updatePortTitle(OverviewPortHeader portHeader){
 		  portHeader2Members(portHeader);
-		  advancedDisclosure.setHeader(new HTML(("<div>" + header + " Updated!" + "</div>")));
+		  advancedDisclosure.setHeader(new HTML(("<div style='background-color: red;'>" + header + " Updated!" + "</div>")));
 	  }
 
 

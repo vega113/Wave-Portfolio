@@ -56,11 +56,10 @@ public class FinanceRetrievePortfolios extends AbstractRetrievePortfolio {
    * success and failure handlers.
    * Here, the failure handler displays an error message while the
    * success handler calls showData to display the portfolio entries.
- * @param portfoliosFeedUri The uri of the portfolios feed
    * 
+   * @param callback {@link WavePortfolio.PopulatePortCallbackImpl}
    * @throws CallErrorException 
    */
-  
   public void retrievePortfolioNames(final AsyncCallback<OverviewPortHeader[]> callback) {
 	  
 	  if (!GData.isLoaded(GDataSystemPackage.FINANCE)) {
@@ -68,7 +67,10 @@ public class FinanceRetrievePortfolios extends AbstractRetrievePortfolio {
 	      GData.loadGDataApi(GDATA_API_KEY, new Runnable() {
 	        public void run() {
 	        	  if (User.getStatus(scope) == AuthSubStatus.LOGGED_IN){
-	        		  execretRievePortfolioNames(callback, URI_FINANCE_PORTFOLIOS);
+	        		  if(service == null){
+	        			  service = FinanceService.newInstance("Wave Portfolio 0.01");
+	        		  }
+	        		  execRetrievePortfolioNames(callback, URI_FINANCE_PORTFOLIOS);
 	        	  }else{
 	        		  Log.debug("User is not logged in: scope -  " + scope + "; status - " + User.getStatus(scope));
 	        	  }
@@ -79,12 +81,15 @@ public class FinanceRetrievePortfolios extends AbstractRetrievePortfolio {
 
 
 
-
-private void execretRievePortfolioNames(
+/**
+ * 
+ * @param callback  {@link: WavePortfolio.PopulatePortCallbackImpl}
+ * @param portfoliosFeedUri
+ */
+private void execRetrievePortfolioNames(
 		final AsyncCallback<OverviewPortHeader[]> callback,
 		String portfoliosFeedUri) {
-	Log.trace("enetering execretRievePortfolioNames");
-	service = FinanceService.newInstance("Wave Portfolio 0.01");
+	Log.debug("enetering execretRievePortfolioNames");
 //	service.setDeveloperKey("ABQIAAAAbvr6gQH1qmQkeIRFd4m2eRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxRY7y9tpXoGhmuQObT-SLOXXKGXlA");
 	service.getPortfolioFeed(portfoliosFeedUri, new PortfolioFeedCallback() {
 		public void onSuccess(PortfolioFeed result) {
@@ -175,5 +180,12 @@ private void execretRievePortfolioNames(
 	   */
 	public void retrievePortfolioOverview(String portfolioId,String cash,String cashTitle, AsyncCallback<OverviewPortRow> asyncCallback) {
 		getPositions(portfolioId, cash, cashTitle, asyncCallback);
+	}
+	
+	private void mutateHeaders(OverviewPortHeader[] headers) {
+		for(OverviewPortHeader header : headers){
+			header.init(header.getPortName(), header.getPortId(), header.getChangeAbsVal() + 0.1, header.getChangePercent() + 0.1, header.getCash() + 0.1, header.getMktValue() + 0.1);
+		}
+		
 	}
 }

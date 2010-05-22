@@ -54,7 +54,7 @@ public class OverviewAsyncCallbackImpl implements AsyncCallback<OverviewPortRow>
 				dsWidget.portPopulate(rows );
 			}
 		}catch(Throwable t){
-			Log.warn("OverviewAsyncCallbackImpl.onSuccess: " +  row ,t);
+			Log.warn("OverviewAsyncCallbackImpl.onSuccess: " +  row + ", " + t.getMessage());
 		}
 	}
 
