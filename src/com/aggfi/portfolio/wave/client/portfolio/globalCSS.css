@@ -1,0 +1,97 @@
+
+@CHARSET "UTF-8";
+
+.waveList {
+	width: 100%;
+
+}
+
+.waveList tr {
+	border-bottom: solid 1px #aaa;
+	margin-bottom: 3px;
+}
+
+.input {
+	border: solid 1px #333;
+	padding: 10px;
+	background: #5591d3;
+}
+
+.input input {
+	width: 70%
+}
+
+.highlightRow {
+	background: #c9e2fc;
+}
+
+.regularRow {
+	background: lightblue;
+}
+
+.headerRow {
+	background: #92c1f0;
+}
+
+.cashRow {
+	background: #E8E8E8;
+}
+
+.upChange {
+	color: darkgreen;
+}
+
+.noChange {
+	color: darkblue;
+}
+
+.black {
+	color: black;
+}
+
+.downChange {
+	color: darkred;
+}
+
+.messageCol {
+	vertical-align: top;
+}
+
+.message {
+	padding: 5px;
+}
+.author {
+	padding: 5px;
+	width: 200px;
+}
+.author img {
+	height: 25px;
+	margin: 3px;
+	float: left;
+}
+
+.bold{
+	font-weight: bold;	
+}
+
+.portHeaderBG{
+	background: white;
+	color: blue;
+}
+
+.leftAlign{
+	text-align: left;	
+}
+
+.centerAlign{
+	text-align: center;	
+}
+
+.rightAlign{
+	text-align: right;
+}
+
+.author div {
+	padding-top: 8px;
+	padding-left: 6px;
+}

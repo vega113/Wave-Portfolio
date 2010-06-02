@@ -37,7 +37,6 @@ public class AuthSub extends Composite {
    */
   public AuthSub() {
     mainPanel = new FlexTable();
-    mainPanel.setCellPadding(4);
     mainPanel.setCellSpacing(0);
     initWidget(mainPanel);
     /* 
@@ -88,7 +87,7 @@ public class AuthSub extends Composite {
 	  Anchor actionLink = new Anchor();
 	  AuthSubStatus status = User.getStatus(scope);
 	  if (status == AuthSubStatus.LOGGED_IN) {
-		  statusLabel.setHTML("<i>Logged in</i>");
+		  statusLabel.setHTML("<i>Logged in </i>");
 		  actionLink.setText("- Log out");
 		  actionLink.addClickHandler(new ClickHandler() {
 			  public void onClick(ClickEvent event) {
@@ -97,7 +96,7 @@ public class AuthSub extends Composite {
 			  }
 		  });
 	  } else if (status == AuthSubStatus.LOGGED_OUT) {
-		  statusLabel.setHTML("<i>Logged out</i>");
+		  statusLabel.setHTML("<i>Logged out </i>");
 		  actionLink.setText("- Log in");
 		  actionLink.addClickHandler(new ClickHandler() {
 			  public void onClick(ClickEvent event) {

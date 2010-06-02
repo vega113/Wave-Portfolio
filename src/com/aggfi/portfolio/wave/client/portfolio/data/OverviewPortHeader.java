@@ -4,6 +4,13 @@ import java.io.Serializable;
 
 
 public class OverviewPortHeader implements Serializable {
+	@Override
+	public String toString() {
+		return "OverviewPortHeader [cash=" + cash + ", changeAbsVal="
+				+ changeAbsVal + ", changePercent=" + changePercent
+				+ ", mktValue=" + mktValue + ", portId=" + portId
+				+ ", portName=" + portName + "]";
+	}
 	public double getCash() {
 		return cash;
 	}

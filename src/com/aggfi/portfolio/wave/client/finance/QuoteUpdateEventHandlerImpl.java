@@ -27,10 +27,15 @@ public class QuoteUpdateEventHandlerImpl implements QuoteUpdateEventHandler
 	 * if so - it will update the row with market data
 	 */
 	
+	/**
+	 * {@link OverviewPortRow.callback}
+	 * The callback updates it's outer row class field members with Quote data
+	 */
 	private AsyncCallback<Data> callback;
 	
 	public void setResult(OverviewPortRow result) {
 		resultMap.put(result.getSymbol(), result);
+		Log.debug("Put stock info to resultMap: " + result.getSymbol());
 	}
 
 
@@ -44,16 +49,22 @@ public class QuoteUpdateEventHandlerImpl implements QuoteUpdateEventHandler
 	public void onUpdate(QuoteUpdateEvent event) {
 		try {
 			
-			Log.trace("Inside QuoteUpdateEventHandlerImpl.onUpdate: " + event.getData().getSymbol());
+			Log.debug("Inside QuoteUpdateEventHandlerImpl.onUpdate: " + extrctSymbol(event.getData().getSymbol()));
 			OverviewPortRow[] rows = new OverviewPortRow[1];
-			rows[0] = resultMap.get(event.getData().getSymbol());
+			rows[0] = resultMap.get(extrctSymbol(event.getData().getSymbol()));
 			if(rows[0] != null){
 				callback = rows[0].getCallback();
 				callback.onSuccess(event.getData());
 				dsWidget.portPopulate(rows );
+			}else{
+				Log.warn("problem inside QuoteUpdateEventHandlerImpl : cannot find row for: " + extrctSymbol(event.getData().getSymbol()) + "; " + event.getData().toStringMy());
 			}
 		} catch (Exception e) {
 			Log.error("in callback", e);
 		}
+	}
+	private String extrctSymbol(String str){
+		String symbol = str.split(":")[2];
+		return symbol;
 	}
 };

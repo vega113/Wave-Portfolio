@@ -4,11 +4,15 @@ package com.aggfi.portfolio.wave.client.portfolio.data;
 import com.aggfi.portfolio.wave.client.finance.feature.Data;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.Widget;
 
 public class OverviewPortRow extends AbstractPortRow{
 	
 	
+
 
 
 
@@ -17,15 +21,21 @@ public class OverviewPortRow extends AbstractPortRow{
 		return "OverviewPortRow [cash=" + cash + ", changeAbsVal="
 				+ changeAbsVal + ", changePercent=" + changePercent
 				+ ", currencyCode=" + currencyCode + ", daysGain=" + daysGain
-				+ ", high=" + high + ", isCashRow=" + isCashRow
-				+ ", lastPrice=" + lastPrice + ", low=" + low + ", mktCap="
-				+ mktCap + ", open=" + open + ", shares=" + shares
-				+ ", volume=" + volume + "]";
+				+ ", exchange=" + exchange + ", high=" + high + ", isCashRow="
+				+ isCashRow + ", lastPrice=" + lastPrice + ", lastTradeTime="
+				+ lastTradeTime + ", low=" + low + ", mktCap=" + mktCap
+				+ ", open=" + open + ", preLastPrice=" + preLastPrice
+				+ ", shares=" + shares + ", timer=" + timer + ", volume="
+				+ volume + ", name=" + name + ", rowNum=" + rowNum
+				+ ", symbol=" + symbol + "]";
 	}
 
 	private boolean isCashRow = false;
 	
 	private double lastPrice;
+	/**
+	 * change since close
+	 */
 	private double changeAbsVal;
 	private double changePercent;
 	private long mktCap;
@@ -35,17 +45,27 @@ public class OverviewPortRow extends AbstractPortRow{
 	private double low;
 	private double daysGain;
 	private double shares;
+	private double preLastPrice;
+	private String exchange;
 	
+	public String getExchange() {
+		return exchange;
+	}
+
 	private String currencyCode;
 
 	private String cash;
-	
+
+	private String lastTradeTime = "";
+
 	public void initOverviewPortRow(double lastPrice, double shares, long mktCap,
 			long volume, double open, double high, double low, double daysGain,
-			String name, String symbol, int rowNum, String stockId) {
+			String name, String symbol, String exchange, int rowNum, String stockId) {
 		super.initOverviewPortRow(name, symbol, rowNum, stockId);
 		
-		this.lastPrice = lastPrice;
+		if(lastPrice > 0){
+			this.lastPrice = lastPrice;
+		}
 		this.changeAbsVal = 0;
 		this.changePercent = 0;
 		this.mktCap = mktCap;
@@ -55,6 +75,8 @@ public class OverviewPortRow extends AbstractPortRow{
 		this.low = low;
 		this.daysGain = daysGain;
 		this.shares = shares;
+		this.preLastPrice = 0;
+		this.exchange = exchange;
 		
 		calcInfo();
 	}
@@ -66,6 +88,10 @@ public class OverviewPortRow extends AbstractPortRow{
 		if(this.shares != 0  && this.shares > -1){
 			this.changeAbsVal = (daysGain)/this.shares;
 		}
+	}
+	
+	private void updateDaysGain(){
+		daysGain = changeAbsVal * (shares != 0 ? shares : 1);
 	}
 	
 	public void initCashOverviewPortRow(String cashStrVal, String cashTitle, int rowNum ){
@@ -85,6 +111,9 @@ public class OverviewPortRow extends AbstractPortRow{
 		return lastPrice;
 	}
 	public void setLastPrice(double lastPrice) {
+//		if(lastPrice > 0){
+//			this.lastPrice = lastPrice;
+//		}
 		this.lastPrice = lastPrice;
 	}
 	/* (non-Javadoc)
@@ -183,30 +212,88 @@ public class OverviewPortRow extends AbstractPortRow{
 	public String getCash() {
 		return cash;
 	}
+	
+	public double getPreLastPrice() {
+		return preLastPrice;
+	}
 
+	public void setPreLastPrice(double preLastPrice) {
+		if(preLastPrice > 0){
+			this.preLastPrice = preLastPrice;
+		}
+	}
+	
+	public String getLastTradeTime() {
+		return lastTradeTime;
+	}
+
+	private void setLastTradeTime(String lastTradeTime) {
+		this.lastTradeTime = lastTradeTime == null ? "" : lastTradeTime;
+		
+	}
+
+	AsyncCallback<Data> callback = new AsyncCallback<Data>() {
+
+		@Override
+		public void onSuccess(Data result) {
+			if(extrctSymbol(result.getSymbol()).equals(getSymbol())){
+				setPreLastPrice(getLastPrice());
+				try {
+					setLastPrice(result.getLast());
+					Log.debug("Last : " + result.getLast() + ", " + extrctSymbol(result.getSymbol()).equals(getSymbol()));
+				} catch (Exception e) {
+					Log.error("",e);
+				}
+				setLastTradeTime(result.getLastTradeTime());
+				setHigh(result.getHigh());
+				setLow(result.getLow());
+				setOpen(result.getOpen());
+				setChangeAbsVal(result.getChange());
+				setChangePercent(result.getChangePercentage() / 100);
+				setOpen(result.getOpen());
+				NumberFormat fmt = NumberFormat.getDecimalFormat();
+				double vol = fmt.parse(result.getVolume());
+				setVolume( vol);
+				updateDaysGain();
+				Log.debug(toString());
+			}
+		}
+
+		@Override
+		public void onFailure(Throwable caught) {
+
+		}
+		
+		private String extrctSymbol(String str){
+			String symbol = str.split(":")[2];
+			return symbol;
+		}
+	};
+	
 	@Override
 	public AsyncCallback<Data> getCallback() {
-		return new AsyncCallback<Data>() {
-
-			@Override
-			public void onSuccess(Data result) {
-				if(result.getSymbol().equals(getSymbol())){
-					setLastPrice(result.getLast());
-					setHigh(result.getHigh());
-					setLow(result.getLow());
-					setOpen(result.getOpen());
-					NumberFormat fmt = NumberFormat.getDecimalFormat();
-					double vol = fmt.parse(result.getVolume());
-					setVolume( vol);
-					Log.trace("symbol: " + result.getSymbol() + ", last: " + result.getLast() + ", " + ", open: " + result.getOpen()+  ", high: " + result.getHigh() + ", " +  "low: " + result.getLow() + ", volume: " + vol + ", ext volume: " + result.getExtVolume());
-					calcInfo();
-				}
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-
-			}
-		};
+		return callback;
 	}
+
+
+	OverviewTimer timer = new OverviewTimer();
+	public OverviewTimer getTimer() {
+		return timer;
+	}
+	public class OverviewTimer extends Timer {
+		FlexTable f = null;
+		public void setF(FlexTable f) {
+			this.f = f;
+		}
+		Widget widget = null;
+		public void setLast(Widget widget) {
+			this.widget = widget;
+		}
+		@Override
+		public void run() {
+			f.setWidget(getRowNum(), 1, widget);
+
+		}
+	}
+
 }

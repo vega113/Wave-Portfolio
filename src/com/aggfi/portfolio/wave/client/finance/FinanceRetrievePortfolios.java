@@ -76,9 +76,11 @@ public class FinanceRetrievePortfolios extends AbstractRetrievePortfolio {
 	        	  }
 	        }
 	      }, GDataSystemPackage.FINANCE);
+	    }else{
+	    	 service = FinanceService.newInstance("Wave Portfolio 0.01");
+	    	 execRetrievePortfolioNames(callback, URI_FINANCE_PORTFOLIOS);
 	    }
   }
-
 
 
 /**
@@ -89,62 +91,22 @@ public class FinanceRetrievePortfolios extends AbstractRetrievePortfolio {
 private void execRetrievePortfolioNames(
 		final AsyncCallback<OverviewPortHeader[]> callback,
 		String portfoliosFeedUri) {
-	Log.debug("enetering execretRievePortfolioNames");
-//	service.setDeveloperKey("ABQIAAAAbvr6gQH1qmQkeIRFd4m2eRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxRY7y9tpXoGhmuQObT-SLOXXKGXlA");
-	service.getPortfolioFeed(portfoliosFeedUri, new PortfolioFeedCallback() {
-		public void onSuccess(PortfolioFeed result) {
-			OverviewPortHeader[] headers = null;
-	        PortfolioEntry[] entries = result.getEntries();
-	        Log.debug("entries length: " + entries.length);
-	        if (entries.length > 0) {
-	        	try{
-
-		        	 headers = new OverviewPortHeader[entries.length];
-		     	    for (int i = 0; i < entries.length; i++) {
-		     	      PortfolioEntry portfolioEntry = entries[i];
-		     	      Log.debug("entry #" + i + ", id : " + portfolioEntry.getId().getValue());
-		     	      headers[i] = buildOverviewPortHeader(portfolioEntry);
-		     	    }
-		        
-	        	}catch (Exception e) {
-	        		Log.error("Failure in execretRievePortfolioNames: ", e);
-				}
-	        } 
-	        callback.onSuccess(headers);
-		}
-		
-		@Override
-		public void onFailure(CallErrorException caught) {
-			Log.error("Failure in execretRievePortfolioNames: ", caught);
-			
-		}
-	});
+	Log.trace("entering execretRievePortfolioNames");
+		//	service.setDeveloperKey("ABQIAAAAbvr6gQH1qmQkeIRFd4m2eRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxRY7y9tpXoGhmuQObT-SLOXXKGXlA");
+	getPortfolioFeed(callback, portfoliosFeedUri);
+		//just for simulation purposes
 	Log.trace("exiting execretRievePortfolioNames");
 }
-  
-	
-	private OverviewPortHeader buildOverviewPortHeader(PortfolioEntry portfolioEntry) {
-		Log.trace("entering buildOverviewPortHeader");
-		OverviewPortHeader header = new OverviewPortHeader();
-		
-		String portfolioId = portfolioEntry.getId().getValue();
-	    PortfolioData portfolioData = portfolioEntry.getPortfolioData();
-	    MarketValue mv = null;
-	    double costBasis = 0;
-	    costBasis = portfolioData.getCostBasis() !=  null && portfolioData.getCostBasis().getMoney() != null ? portfolioData.getCostBasis().getMoney()[0].getAmount() : 0;
-	    mv = portfolioData.getMarketValue();
-	    double mktValue = mv != null && mv.getMoney() != null ? mv.getMoney()[0].getAmount() : 0;
-	    DaysGain dg = portfolioData.getDaysGain();
-	    double portTodayGain  =  dg != null ? dg.getMoney()[0].getAmount() : 0;
-	    double changePercent = mktValue - portTodayGain != 0 ? portTodayGain/( mktValue - portTodayGain) : 0;
-	    String portName = portfolioEntry.getTitle().getText();
-	    double gain = portfolioData.getGain() != null && portfolioData.getGain().getMoney() != null ? portfolioData.getGain().getMoney()[0].getAmount() : 0;
-	    double cash = mktValue-gain-costBasis;
-	    header.init(portName,portfolioId, portTodayGain,  changePercent, cash, mktValue);
-	    Log.trace("Exiting buildOverviewPortHeader");
-	    return header;
-	  }
-	
+
+
+private void getPortfolioFeed(
+		final AsyncCallback<OverviewPortHeader[]> callback,
+		String portfoliosFeedUri) {
+	PortfolioFeedCallbackImpl portfolioFeedCallbackImpl = PoolFinanceCallbacks.instance().getPortfolioFeedCallbackImpl(portfoliosFeedUri);
+	portfolioFeedCallbackImpl.setCallback(callback);
+	service.getPortfolioFeed(portfoliosFeedUri, portfolioFeedCallbackImpl);
+}
+
 //	PositionFeedCallbackImpl positionFeedCallbackImpl = new PositionFeedCallbackImpl();
 	
 	/**
@@ -163,7 +125,6 @@ private void execRetrievePortfolioNames(
 		  Log.trace("Entering getPositions");
 		  Log.debug("portfolioId: " + portfolioId );
 		  String positionsFeedUri = portfolioId+ "/positions?returns=true&transactions=true";
-//	    String positionsFeedUri = portfolioId + "/positions";
 		  PositionFeedCallbackImpl positionFeedCallbackImpl  = PoolFinanceCallbacks.instance().getPositionFeedCallbackImpl(portfolioId);
 		  positionFeedCallbackImpl.setCallback(callback);
 		  positionFeedCallbackImpl.setCash(cash);
@@ -176,16 +137,9 @@ private void execRetrievePortfolioNames(
 	   * @param portfolioId
 	   * @param cash
 	   * @param cashTitle
-	   * @param asyncCallback - {@link:OverviewAsyncCallbackImpl}}
+	   * @param asyncCallback - {@link: OverviewAsyncCallbackImpl}}
 	   */
 	public void retrievePortfolioOverview(String portfolioId,String cash,String cashTitle, AsyncCallback<OverviewPortRow> asyncCallback) {
 		getPositions(portfolioId, cash, cashTitle, asyncCallback);
-	}
-	
-	private void mutateHeaders(OverviewPortHeader[] headers) {
-		for(OverviewPortHeader header : headers){
-			header.init(header.getPortName(), header.getPortId(), header.getChangeAbsVal() + 0.1, header.getChangePercent() + 0.1, header.getCash() + 0.1, header.getMktValue() + 0.1);
-		}
-		
 	}
 }

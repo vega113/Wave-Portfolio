@@ -1,10 +1,10 @@
 <extension 
     name="Wave Portfolio v.002"
-    thumbnailUrl="http://waveportfolio.appspot.com/gdata-finance.png"
+    thumbnailUrl="http://waveportfolio.appspot.com/Google-Finance-256.png"
     description="Share your Google Portfolio with the Wave."> 
   <author name="Aggfi"/> 
   <menuHook location="toolbar" text="Add Wave Portfolio"
-      iconUrl="http://waveportfolio.appspot.com/Google-Finance-256.png"> 
+      iconUrl="http://waveportfolio.appspot.com/gdata-finance.png"> 
     <insertGadget url="http://waveportfolio.appspot.com/waveportfolio/com.aggfi.portfolio.wave.client.WavePortfolio.gadget.xml"/> 
   </menuHook> 
 </extension> 

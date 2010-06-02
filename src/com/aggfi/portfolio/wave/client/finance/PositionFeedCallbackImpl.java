@@ -1,5 +1,8 @@
 package com.aggfi.portfolio.wave.client.finance;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.aggfi.portfolio.wave.client.portfolio.data.OverviewPortRow;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.gdata.client.finance.PositionData;
@@ -33,6 +36,7 @@ public class PositionFeedCallbackImpl implements PositionFeedCallback {
 	}
 
 	private String cashTitle;
+	private Map<String,OverviewPortRow> rowMap = new HashMap<String,OverviewPortRow>();
 	private String cash;
 
 	@Override
@@ -52,9 +56,8 @@ public class PositionFeedCallbackImpl implements PositionFeedCallback {
 					String id = posEntry.getId() != null ? posEntry.getId().getValue() : "null in id";
 					Log.info("Looping positions entries: " + id);
 					int stockNum = counter + 1; // +1 it beacause of table header - it's also a row
-					OverviewPortRow row = new OverviewPortRow();
 					PositionData posData =  posEntry.getPositionData();
-
+					OverviewPortRow row = getRow(id);
 					double lastPrice = 0;
 					//------- where from do i take volume and mktCap ? //TODO
 					long mktCap = 0;
@@ -63,10 +66,11 @@ public class PositionFeedCallbackImpl implements PositionFeedCallback {
 					double open = 0;
 					double high = 0;
 					double low = 0;
+					
 
 					String name = posEntry.getTitle() != null ? posEntry.getTitle().getText() : "null in title";
 					String symbol = posEntry.getSymbol() != null ? posEntry.getSymbol().getSymbol() : "null in symbol";
-
+					String exchange = posEntry.getSymbol() != null ? posEntry.getSymbol().getExchange() : "null in symbol";
 					double daysGain = 0;
 					try {
 						daysGain = posData.getDaysGain().getMoney()[0].getAmount();
@@ -80,8 +84,7 @@ public class PositionFeedCallbackImpl implements PositionFeedCallback {
 					}catch (com.google.gwt.core.client.JavaScriptException e) {
 //						Log.warn (e.getMessage());
 					}
-					String stockId = id;
-					row.initOverviewPortRow(lastPrice,shares,mktCap,volume,open,high,low,daysGain,name,symbol,stockNum,stockId);
+					row.initOverviewPortRow(lastPrice,shares,mktCap,volume,open,high,low,daysGain,name,symbol,exchange,stockNum,id);
 					rows[counter] = row;
 					counter++;
 					Log.trace("Before calling callback.onSuccess : " + row.getSymbol());
@@ -90,13 +93,23 @@ public class PositionFeedCallbackImpl implements PositionFeedCallback {
 				//add row with cash
 				int stockNum = counter + 1;
 				Log.trace("Adding cash row num: " +stockNum);
-				OverviewPortRow row = new OverviewPortRow();
+				OverviewPortRow row = getRow(result.getId().getValue() + "cash");
 				row.initCashOverviewPortRow(cash,cashTitle,stockNum);
 				callback.onSuccess(row);
 			}
 		}catch(Exception e){
 			Log.error("positionFeedCallbackImpl.onSuccess Failed! ", e);
 		}
+	}
+
+	private OverviewPortRow getRow(String id) {
+		OverviewPortRow row =  rowMap.get(id);
+		if(row == null){
+			row = new OverviewPortRow();
+			rowMap.put(id, row);
+			Log.info("creating new row: " + id);
+		}
+		return row;
 	}
 
 	@Override

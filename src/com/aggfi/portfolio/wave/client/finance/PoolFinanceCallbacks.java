@@ -3,6 +3,7 @@ package com.aggfi.portfolio.wave.client.finance;
 
 import java.util.HashMap;
 
+//import com.aggfi.portfolio.wave.client.finance.feature.FinanceFeature;
 import com.aggfi.portfolio.wave.client.finance.feature.FinanceFeature;
 import com.aggfi.portfolio.wave.client.portfolio.DisclosureWidget;
 
@@ -10,6 +11,7 @@ import com.aggfi.portfolio.wave.client.portfolio.DisclosureWidget;
 public class PoolFinanceCallbacks {
 	private static PoolFinanceCallbacks instance = null;
 	
+	private HashMap<String,PortfolioFeedCallbackImpl> porfolioPool = new HashMap<String,PortfolioFeedCallbackImpl> ();
 	private HashMap<String,PositionFeedCallbackImpl> positionsPool = new HashMap<String,PositionFeedCallbackImpl> ();
 	private HashMap<String,OverviewAsyncCallbackImpl> overviewsPool = new HashMap<String,OverviewAsyncCallbackImpl> ();
 	
@@ -30,6 +32,15 @@ public class PoolFinanceCallbacks {
 	 * @param financeFearure
 	 * @return
 	 */
+	public  PortfolioFeedCallbackImpl getPortfolioFeedCallbackImpl(String id){
+		PortfolioFeedCallbackImpl handler = porfolioPool.get(id);
+		if(handler == null){
+			handler = new PortfolioFeedCallbackImpl();
+			porfolioPool.put(id, handler);
+		}
+		return handler;
+	}
+
 	public  PositionFeedCallbackImpl getPositionFeedCallbackImpl(String positionId){
 		PositionFeedCallbackImpl handler = positionsPool.get(positionId);
 		if(handler == null){
@@ -38,6 +49,19 @@ public class PoolFinanceCallbacks {
 		}
 		return handler;
 	}
+
+	public OverviewAsyncCallbackImpl getOverviewAsyncCallbackImpll(
+			DisclosureWidget dsWidget) {
+		String id = dsWidget.getPortId();
+		OverviewAsyncCallbackImpl handler = overviewsPool.get(id);
+		if(handler == null){
+			handler = new OverviewAsyncCallbackImpl();
+			overviewsPool.put(id, handler);
+			handler.setDsWidget(dsWidget);
+		}
+		return handler;
+	}
+	
 	
 	public OverviewAsyncCallbackImpl getOverviewAsyncCallbackImpll(
 			DisclosureWidget dsWidget, FinanceFeature financeFearure) {
@@ -51,4 +75,5 @@ public class PoolFinanceCallbacks {
 		}
 		return handler;
 	}
+	
 }

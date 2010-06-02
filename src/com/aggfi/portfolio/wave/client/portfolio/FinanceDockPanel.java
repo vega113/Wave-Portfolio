@@ -1,5 +1,7 @@
 package com.aggfi.portfolio.wave.client.portfolio;
 
+import java.util.HashMap;
+
 import com.aggfi.portfolio.wave.client.WavePortfolio.CwConstants;
 import com.aggfi.portfolio.wave.client.WavePortfolio.CwMessages;
 import com.allen_sauer.gwt.log.client.Log;
@@ -12,16 +14,16 @@ public class FinanceDockPanel extends DockPanel {
 	
 	private FlexTable layoutOverview;
 
-	public FinanceDockPanel(CwConstants constants, CwMessages messages, String TAB_PANEL_WIDTH) {
+	public FinanceDockPanel(CwConstants constants, CwMessages messages, int width) {
 		Log.trace("Entering createWidgetPanel");
-		final FlexTable layout = new FlexTable();
+		final FlexTable portfolioNamesLayout = new FlexTable();
 
-		layout.setCellSpacing(1);
+		portfolioNamesLayout.setCellSpacing(0);
 		//	    layout.setWidth(LAYOUT_WIDTH);
 
 		DockPanel dock = this;
 		//	    dock.setStyleName("cw-DockPanel");
-		dock.setSpacing(4);
+		dock.setSpacing(0);
 		dock.setHorizontalAlignment(DockPanel.ALIGN_CENTER);
 
 
@@ -30,18 +32,18 @@ public class FinanceDockPanel extends DockPanel {
 
 		//create tab panel
 		DecoratedTabPanel tabPanel = new DecoratedTabPanel();
-		tabPanel.setWidth(TAB_PANEL_WIDTH);
+		tabPanel.setWidth(width+"px");
 		tabPanel.setAnimationEnabled(true);
 
 		// Add a home tab
-		String[] tabTitles = {constants.cwOverview(),constants.cwNews(),constants.cwPerformance(),constants.cwTransactions()};
-		tabPanel.add(layout, tabTitles[0]);
+		String[] tabTitles = {constants.cwPortfolio(),constants.cwFeeds(),constants.cwSettings()};
+		tabPanel.add(portfolioNamesLayout, tabTitles[0]);
 
-		tabPanel.add(new HTML(constants.cwNews() + ": not Implemented Yet"), tabTitles[1]);
+//		tabPanel.add(new HTML(constants.cwNews() + ": not Implemented yet"), tabTitles[1]);
 
-		tabPanel.add(new HTML(constants.cwPerformance() + ": not Implemented Yet"), tabTitles[2]);
+		tabPanel.add(new HTML(constants.cwFeeds() + ": This tab should contain transactions by user and by Aggfi community - each in separate tab. Displayed Aggfi transactions will be relavant to stocks in user portfolio only"), tabTitles[1]);
 
-		tabPanel.add(new HTML(constants.cwTransactions() + ": not Implemented Yet"), tabTitles[3]);
+		tabPanel.add(new HTML(constants.cwSettings() + ": This tab should allow modification of user settings: add/remove columns in Portfolios tab, community settins - load contacts to Aggfi etc.."), tabTitles[2]);
 
 		tabPanel.selectTab(0);
 		tabPanel.ensureDebugId("cwTabPanel");    
@@ -51,8 +53,8 @@ public class FinanceDockPanel extends DockPanel {
 
 		Log.trace("Exiting createWidgetPanel");
 		//add loading image
-		layout.setWidget(0, 0, new HTML("<div><img src='http://www.google.com/ig/images/spinner.gif'>" + constants.cwLoading() + "</div> "));
-		layoutOverview = layout;
+		portfolioNamesLayout.setWidget(0, 0, new HTML("<div><img src='http://www.google.com/ig/images/spinner.gif'>" + constants.cwLoading() + "</div> "));
+		layoutOverview = portfolioNamesLayout;
 	}
 
 	public FlexTable getLayoutOverview() {
