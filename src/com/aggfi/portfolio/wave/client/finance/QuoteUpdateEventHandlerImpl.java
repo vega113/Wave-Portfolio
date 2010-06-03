@@ -47,24 +47,33 @@ public class QuoteUpdateEventHandlerImpl implements QuoteUpdateEventHandler
 
 	@Override
 	public void onUpdate(QuoteUpdateEvent event) {
+		String symbol = extrctSymbol(event.getData().getSymbol());
 		try {
 			
-			Log.debug("Inside QuoteUpdateEventHandlerImpl.onUpdate: " + extrctSymbol(event.getData().getSymbol()));
+			Log.debug("Inside QuoteUpdateEventHandlerImpl.onUpdate: " + symbol);
 			OverviewPortRow[] rows = new OverviewPortRow[1];
-			rows[0] = resultMap.get(extrctSymbol(event.getData().getSymbol()));
+			rows[0] = resultMap.get(symbol);
 			if(rows[0] != null){
 				callback = rows[0].getCallback();
 				callback.onSuccess(event.getData());
 				dsWidget.portPopulate(rows );
 			}else{
-				Log.warn("problem inside QuoteUpdateEventHandlerImpl : cannot find row for: " + extrctSymbol(event.getData().getSymbol()) + "; " + event.getData().toStringMy());
+				Log.warn("problem inside QuoteUpdateEventHandlerImpl : cannot find row for: " + symbol + "; " + event.getData().toStringMy());
 			}
 		} catch (Exception e) {
 			Log.error("in callback", e);
 		}
 	}
 	private String extrctSymbol(String str){
-		String symbol = str.split(":")[2];
+		String symbol = str;
+		if(str.contains(":")){
+			try{
+				symbol = str.split(":")[2];
+				Log.warn("Split! " + str);
+			}catch(Exception e){
+				Log.error("QuoteUpdateEventHandlerImpl:extrctSymbol",e);
+			}
+		}
 		return symbol;
 	}
 };

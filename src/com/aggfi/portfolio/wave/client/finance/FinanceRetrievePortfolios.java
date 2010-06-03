@@ -123,7 +123,7 @@ private void getPortfolioFeed(
 	   */
 	  private void getPositions(final String portfolioId, final String cash, final String cashTitle, final AsyncCallback<OverviewPortRow> callback) {
 		  Log.trace("Entering getPositions");
-		  Log.debug("portfolioId: " + portfolioId );
+		  Log.trace("portfolioId: " + portfolioId );
 		  String positionsFeedUri = portfolioId+ "/positions?returns=true&transactions=true";
 		  PositionFeedCallbackImpl positionFeedCallbackImpl  = PoolFinanceCallbacks.instance().getPositionFeedCallbackImpl(portfolioId);
 		  positionFeedCallbackImpl.setCallback(callback);

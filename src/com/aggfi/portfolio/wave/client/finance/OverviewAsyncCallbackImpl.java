@@ -36,7 +36,6 @@ public class OverviewAsyncCallbackImpl implements AsyncCallback<OverviewPortRow>
 			List<String> symbolsList = new ArrayList<String>();
 			// now create list of symbols for this portfolio and also collect callbacks for each portfolio row which will be invkoed
 			//when marked data will arrive
-			Log.debug("Inside OverviewAsyncCallbackImpl.onSuccess - creating list of stock symbols and callbacks from row: " + row.getSymbol());
 			if(row == null){ // no entries in portfolio
 				dsWidget.portPopulate(null);
 			}

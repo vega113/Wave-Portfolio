@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class OverviewFlexTable extends FlexTable {
@@ -32,11 +33,13 @@ public class OverviewFlexTable extends FlexTable {
 	
 	protected GlobalResources res;
 	private HashMap<String, ColSettings> dockPanelSettings;
+	private int width;
 	
-	public OverviewFlexTable(CwConstants cwConstants, CwMessages messages, HashMap<String, ColSettings> dockPanelSettings){
+	public OverviewFlexTable(CwConstants cwConstants, CwMessages messages, HashMap<String, ColSettings> dockPanelSettings, int width){
 		this.constants = cwConstants;
 		this.messages = messages;
 		this.dockPanelSettings = dockPanelSettings;
+		this.width = width;
 		res = GlobalResources.INSTANCE;
 		res.globalCSS().ensureInjected();
 		this.setStylePrimaryName(res.globalCSS().waveList());
@@ -104,9 +107,11 @@ public class OverviewFlexTable extends FlexTable {
 			}
 			
 			if(dockPanelSettings.get("gain").getColNum() > -1){
-				this.setText(0, dockPanelSettings.get("gain").getColNum(), constants.cwDaysGain());
+				HTML gainHTML = new HTML( constants.cwDaysGain());
+				this.setWidget(0, dockPanelSettings.get("gain").getColNum(),gainHTML);
 //				colFormatter.setWidth(0, "11px");
 				colFormatter.setWidth(dockPanelSettings.get("gain").getColNum(), dockPanelSettings.get("gain").getWidth() + "px");
+				gainHTML.setTitle(constants.cwDaysGainTooltip());
 			}
 			Widget spiningWidget = null;
 			spiningWidget = new HTML("<div><img src='http://www.google.com/ig/images/spinner.gif'>" + constants.cwLoading() + "</div> ");
@@ -155,9 +160,6 @@ public class OverviewFlexTable extends FlexTable {
 					if (row.getLastPrice() != 0) {
 						double pre = row.getPreLastPrice();
 						double last = row.getLastPrice();
-						//--------------- TODO REMOVE
-						Log.info("in table last : " + row.getLastPrice());
-						//-------------------
 						//now find how many digits changed
 						if(pre != last){
 							Widget w =  lastPriceByChange(pre,last);
@@ -173,28 +175,29 @@ public class OverviewFlexTable extends FlexTable {
 							t.schedule(constants.cwChangeHighlightDuration());
 						}
 					}else{
-						Log.warn("No Last for: " + row.toString()); //FIXME - check why last no bigger than -1
+						Log.warn("No Last for: " + row.toString()); 
 					}
 				}
 				
 				if(dockPanelSettings.get("change").getColNum() > -1){
 					Widget changeWidget = null;
-					if(getWidget(rowsCount, dockPanelSettings.get("change").getColNum()) == null){
-						changeWidget = fmtBig.formatChange(row.getChangeAbsVal(), row.getChangePercent(), messages);
+					Panel chnagePanel = null;
+					if(width < 301){
+						chnagePanel = new VerticalPanel();
 					}else{
-						changeWidget = fmtBig.formatChange(row.getChangeAbsVal(), row.getChangePercent(), messages, (Panel)getWidget(rowsCount, dockPanelSettings.get("change").getColNum()));
+						chnagePanel = new HorizontalPanel();
 					}
-					if (changeWidget != null) {
-						changeWidget.setTitle(constants.cwStockChangeTooltip());
-						this.setWidget(rowsCount, dockPanelSettings.get("change").getColNum(), changeWidget);
-						if(row.getChangeAbsVal() < 0){
-							changeWidget.setStyleName( res.globalCSS().downChange());
-						}else if(row.getChangeAbsVal() > 0){
-							changeWidget.setStyleName(res.globalCSS().upChange());
-						}else{
-							changeWidget.setStyleName( res.globalCSS().noChange());
-						}
+					changeWidget = fmtBig.formatChange(row.getChangeAbsVal(), row.getChangePercent(), messages,chnagePanel);
+					changeWidget.setTitle(constants.cwStockChangeTooltip());
+					if(row.getChangeAbsVal() < 0){
+						changeWidget.setStyleName( res.globalCSS().downChange());
+					}else if(row.getChangeAbsVal() > 0){
+						changeWidget.setStyleName(res.globalCSS().upChange());
+					}else{
+						changeWidget.setStyleName( res.globalCSS().noChange());
 					}
+					changeWidget.setTitle(constants.cwDaysGainTooltip());
+					this.setWidget(rowsCount, dockPanelSettings.get("change").getColNum(), changeWidget); 
 				}
 				
 				if(dockPanelSettings.get("volume").getColNum() > -1){

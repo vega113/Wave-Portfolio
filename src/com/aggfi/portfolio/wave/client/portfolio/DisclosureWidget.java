@@ -114,7 +114,7 @@ public class DisclosureWidget extends VerticalPanel {
 //		colFormatter.setWidth(4, "15%");
 		
 		Widget mktValueVal = new HTML(NumberFormat.getCurrencyFormat().format(mktValue));
-		mktValueVal.setTitle(constants.cwMktValue());
+		mktValueVal.setTitle(constants.cwPortMktValueTooltip());
 		headerTable.setWidget(0, 3, mktValueVal);
 		
 		headerTable.setStyleName(res.globalCSS().portHeaderBG());
@@ -130,8 +130,9 @@ public class DisclosureWidget extends VerticalPanel {
 			colFormatter.setWidth(2, "30%");
 			colFormatter.setWidth(3, "31%");
 		}else{
-			colFormatter.setWidth(0, "10px");
-			colFormatter.setWidth(1, "50px%");
+			colFormatter.setWidth(0, "15px");
+			colFormatter.setWidth(1, "100px%");
+			colFormatter.setWidth(2, "100px%");
 			colFormatter.setWidth(2, "100px%");
 //			colFormatter.setWidth(3, "26%");
 		}
@@ -184,7 +185,7 @@ public class DisclosureWidget extends VerticalPanel {
 	    // Add the disclosure panels to a panel
 	    this.setSpacing(0);
 	    disclosurePanel = createAdvancedForm();
-	    table = new OverviewFlexTable(constants, messages,dockPanelSettings);
+	    table = new OverviewFlexTable(constants, messages,dockPanelSettings, width);
 	    disclosurePanel.add(table);
 	    disclosurePanel.setWidth(width+"px");
 	    DecoratorPanel dpanel = new DecoratorPanel();

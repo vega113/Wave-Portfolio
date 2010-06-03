@@ -11,10 +11,6 @@
 		<servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
 	</servlet>
 
-<!--	<servlet>-->
-<!--		<servlet-name>gFinanceServlet</servlet-name>-->
-<!--		<servlet-class>com.aggfi.portfolio.wave.server.GFinanceServiceImpl</servlet-class>-->
-<!--	</servlet>-->
 	
 
 	<servlet-mapping>
@@ -22,11 +18,6 @@
 		<url-pattern>/waveportfolio/gwt-log</url-pattern>
 	</servlet-mapping>
 
-<!--	<servlet-mapping>-->
-<!--		<servlet-name>gFinanceServlet</servlet-name>-->
-<!--		<url-pattern>/waveportfolio/gfinance</url-pattern>-->
-<!--	</servlet-mapping>-->
-	<!-- Default page to serve -->
 
 	<welcome-file-list>
 		<welcome-file>WavePortfolio.html</welcome-file>

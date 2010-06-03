@@ -24,8 +24,8 @@ public class FormatBigNumbers {
 	protected GlobalResources res;
 	CwConstants constants;
 	CwMessages messages;
-	private HTML changeAbsHtml = new HTML();
-	private HTML changePercentHtml = new HTML();
+	private HTML changeAbsHtml = null;
+	private HTML changePercentHtml = null;
 	
 	public String format(double bnum){
 		try{
@@ -53,6 +53,9 @@ public class FormatBigNumbers {
 		NumberFormat nfmt2 = NumberFormat.getFormat("###.##'%'");
 		String sign1 = changeAbsVal < 0 ? "" : "+";
 		String sign2 = changePercent < 0 ? "" : "+";
+		
+		changeAbsHtml = new HTML();
+		changePercentHtml = new HTML();
 		
 		String changeAbsValStr = sign1 + nfmt1.format(changeAbsVal);
 		String changePercentStr = sign2 + nfmt2.format(changePercent*100);

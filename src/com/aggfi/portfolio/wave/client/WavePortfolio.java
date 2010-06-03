@@ -114,6 +114,7 @@ public class WavePortfolio extends Gadget<PortfolioPreferences> implements Needs
 	}
 
 	private void initResolutions() {
+		//resolution - pixels corresponding to that resolution
 		resolutionsMap.put(ResolutionEnum._1024x1280, 300);
 		resolutionsMap.put(ResolutionEnum._1920x1280, 500);
 	}
@@ -411,41 +412,32 @@ public class WavePortfolio extends Gadget<PortfolioPreferences> implements Needs
 	private HashMap<String, ColSettings> defaultDockPanelSettings() {
 		HashMap<String, ColSettings> settings = new HashMap<String, ColSettings>();
 		// key - symbol name, width, column location number -> -1 - don't show
-		ColSettings symbolSettings;
-		ColSettings lastSettings;
-		ColSettings changeSettings;
-		ColSettings volumeSettings;
-		ColSettings openSettings;
-		ColSettings lowSettings;
-		ColSettings highSettings;
-		ColSettings gainSettings;
+		ColSettings symbolSettings = null;
+		ColSettings lastSettings = null;
+		ColSettings changeSettings = null;
+		ColSettings volumeSettings = null;
+		ColSettings openSettings = null;
+		ColSettings lowSettings = null;
+		ColSettings highSettings = null;
+		ColSettings gainSettings = null;
 		if (currResolution == ResolutionEnum._1024x1280) {
 			symbolSettings = new ColSettings("symbol", 10, 0);
 			lastSettings = new ColSettings("last", 30, 1);
-			changeSettings = new ColSettings("change", 10, 2);
+			changeSettings = new ColSettings("change", 20, 2);
 			volumeSettings = new ColSettings("volume", 10, 3);
 			openSettings = new ColSettings("open", 10, -1);
 			lowSettings = new ColSettings("low", 10, -1);
 			highSettings = new ColSettings("high", 10, -1);
 			gainSettings = new ColSettings("gain", 10, 4);
 		}else if (currResolution == ResolutionEnum._1920x1280) {
-			symbolSettings = new ColSettings("symbol", 10, 0);
-			lastSettings = new ColSettings("last", 30, 1);
-			changeSettings = new ColSettings("change", 10, 2);
-			volumeSettings = new ColSettings("volume", 10, 3);
-			openSettings = new ColSettings("open", 10, 4);
-			lowSettings = new ColSettings("low", 10, 5);
-			highSettings = new ColSettings("high", 10, 6);
-			gainSettings = new ColSettings("gain", 10, 7);
-		}else{
-			symbolSettings = new ColSettings("symbol", 10, 0);
-			lastSettings = new ColSettings("last", 30, 1);
-			changeSettings = new ColSettings("change", 10, 2);
-			volumeSettings = new ColSettings("volume", 10, 3);
-			openSettings = new ColSettings("open", 10, -1);
-			lowSettings = new ColSettings("low", 10, -1);
-			highSettings = new ColSettings("high", 10, -1);
-			gainSettings = new ColSettings("gain", 10, 4);
+			symbolSettings = new ColSettings("symbol", 30, 0);
+			lastSettings = new ColSettings("last", 50, 1);
+			changeSettings = new ColSettings("change", 100, 2);
+			volumeSettings = new ColSettings("volume", 100, 3);
+			openSettings = new ColSettings("open", 50, 4);
+			lowSettings = new ColSettings("low", 50, 5);
+			highSettings = new ColSettings("high", 50, 6);
+			gainSettings = new ColSettings("gain", 50, 7);
 		}
 		
 		settings.put(symbolSettings.getColName(), symbolSettings);
@@ -561,6 +553,12 @@ public class WavePortfolio extends Gadget<PortfolioPreferences> implements Needs
 		
 		@DefaultStringValue(value = "Change in Stock value since Close")
 		String cwStockChangeTooltip();
+		
+		@DefaultStringValue(value = "Day's gain: Change x Shares")
+		String cwDaysGainTooltip();
+		
+		@DefaultStringValue(value = "Market value of Portfolio")
+		String cwPortMktValueTooltip();
 		
 		//-------------------------------
 
